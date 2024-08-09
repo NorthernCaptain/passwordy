@@ -4,6 +4,8 @@ import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/widgets/password_field.dart';
 
 class MasterPasswordScreen extends StatefulWidget {
+  const MasterPasswordScreen({super.key});
+
   @override
   _MasterPasswordScreenState createState() => _MasterPasswordScreenState();
 }
@@ -25,7 +27,7 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen> {
               const SizedBox(height: 40),
               Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: 200,
                     maxWidth: 200 * 16 / 9, // 16:9 aspect ratio
                   ),
@@ -75,11 +77,11 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen> {
               PasswordTextField(controller: _confirmPasswordController, labelText: 'Confirm Master Password'),
               const SizedBox(height: 40),
               ElevatedButton(
-                child: const Text('Continue'),
                 onPressed: _onContinuePressed,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
+                child: const Text('Continue'),
               ),
             ],
           ),

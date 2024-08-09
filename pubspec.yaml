@@ -41,7 +41,12 @@ dependencies:
   cupertino_icons: ^1.0.6
   path_provider: ^2.1.4
   logger: ^2.4.0
+  uuid: ^4.4.2
+  crypto: ^3.0.3
+  base32: ^2.1.3
 
+  local_auth_android: any
+  qr_code_scanner: ^1.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

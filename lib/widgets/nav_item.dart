@@ -7,12 +7,12 @@ class CircularNavItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const CircularNavItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +27,9 @@ class CircularNavItem extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: InkWell(
-            customBorder: CircleBorder(),
+            customBorder: const CircleBorder(),
             onTap: onTap,
-            child: Container(
+            child: SizedBox(
               width: 70,
               height: 70,
               child: Column(
@@ -40,7 +40,7 @@ class CircularNavItem extends StatelessWidget {
                     color: isSelected ? Colors.blue : Colors.grey,
                     size: 24,
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     label,
                     style: TextStyle(

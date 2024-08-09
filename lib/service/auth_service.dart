@@ -15,7 +15,7 @@ class AuthService {
 
   factory AuthService() => _instance;
 
-  String? currentPassword = null;
+  String? currentPassword;
   bool isAuthenticated = false;
 
   Future<AuthStatus> loginState() async {
@@ -26,7 +26,7 @@ class AuthService {
   }
 
   final LocalAuthentication _localAuth = LocalAuthentication();
-  final FlutterSecureStorage _secureStorage = FlutterSecureStorage(
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
       aOptions: AndroidOptions(
         encryptedSharedPreferences: true,
       ));
@@ -40,7 +40,7 @@ class AuthService {
     try {
       isAuthenticated = await _localAuth.authenticate(
         localizedReason: 'Scan your fingerprint to authenticate',
-        authMessages: [AndroidAuthMessages(cancelButton: 'Back to password')],
+        authMessages: [const AndroidAuthMessages(cancelButton: 'Back to password')],
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: true,

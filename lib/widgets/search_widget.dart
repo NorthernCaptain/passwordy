@@ -5,7 +5,7 @@ class SearchWidget extends StatefulWidget {
   final Function(String) onSearch;
   final int debounceTime;
 
-  const SearchWidget({Key? key, required this.onSearch, this.debounceTime = 400}) : super(key: key);
+  const SearchWidget({super.key, required this.onSearch, this.debounceTime = 400});
 
   @override
   _SearchWidgetState createState() => _SearchWidgetState();
@@ -25,16 +25,16 @@ class _SearchWidgetState extends State<SearchWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: TextField(
         controller: _searchController,
         focusNode: _searchFocusNode,
         decoration: InputDecoration(
           hintText: 'Search...',
-          prefixIcon: Icon(Icons.search),
+          prefixIcon: const Icon(Icons.search),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-            icon: Icon(Icons.clear),
+            icon: const Icon(Icons.clear),
             onPressed: () {
               _searchController.clear();
               _searchFocusNode.unfocus();
@@ -48,7 +48,7 @@ class _SearchWidgetState extends State<SearchWidget> {
           ),
           filled: true,
           fillColor: Colors.white,
-          contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
         ),
         onSubmitted: (value) {
           _searchFocusNode.unfocus();

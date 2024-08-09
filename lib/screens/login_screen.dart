@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:passwordy/screens/home_screen.dart';
 import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/service/db_vault.dart';
@@ -8,6 +7,8 @@ import 'package:passwordy/widgets/password_field.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService authService = AuthService();
+
+  LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -48,16 +49,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> nextScreen() async {
-    Vault dbVault = DBVault();
+    Vault dbVault = Vault.vault;
     final result = await dbVault.openDB();
     if(!result) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password does not match'), backgroundColor: Theme.of(context).colorScheme.error),
+        SnackBar(content: const Text('Password does not match'), backgroundColor: Theme.of(context).colorScheme.error),
       );
       return;
     }
     lg?.i('DB opened: $result');
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
 
   void _onContinuePressed() {
@@ -82,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: 200,
                     maxWidth: 200 * 16 / 9, // 16:9 aspect ratio
                   ),
@@ -112,13 +113,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _onContinuePressed,
-                child: const Text('Continue'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                child: const Text('Continue'),
               ),
               if (_showBiometricsButton) ...[
                 const SizedBox(height: 16),

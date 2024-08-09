@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/service/log.dart';
+import 'package:passwordy/service/db_vault.dart';
+import 'package:passwordy/service/database.dart';
 import 'package:passwordy/widgets/nav_item.dart';
 import 'package:passwordy/widgets/new_item_chooser.dart';
 import 'package:passwordy/widgets/search_widget.dart';
+import 'package:passwordy/screens/totp_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -13,10 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
-    SearchPage(),
-    NotificationsPage(),
-    ProfilePage(),
+    const HomePage(),
+    const AuthenticatorScreen(),
+    const NotificationsPage(),
+    const ProfilePage(),
   ];
 
   @override
@@ -50,35 +55,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBottomAppBar() {
     return BottomAppBar(
-      shape: CircularNotchedRectangle(),
+      shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
-      child: Container(
+      child: SizedBox(
         height: 80.0,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             CircularNavItem(
-              icon: Icons.home,
-              label: 'Home',
+              icon: Icons.key,
+              label: 'Vault',
               isSelected: _selectedIndex == 0,
               onTap: () => _onItemTapped(0),
             ),
             CircularNavItem(
-              icon: Icons.search,
-              label: 'Search',
+              icon: Icons.generating_tokens_outlined,
+              label: 'Tokens',
               isSelected: _selectedIndex == 1,
               onTap: () => _onItemTapped(1),
             ),
-            SizedBox(width: 60.0),
+            const SizedBox(width: 60.0),
             CircularNavItem(
-              icon: Icons.notifications,
-              label: 'Notifications',
+              icon: Icons.password,
+              label: 'Passwords',
               isSelected: _selectedIndex == 2,
               onTap: () => _onItemTapped(2),
             ),
             CircularNavItem(
-              icon: Icons.person,
-              label: 'Profile',
+              icon: Icons.settings,
+              label: 'Settings',
               isSelected: _selectedIndex == 3,
               onTap: () => _onItemTapped(3),
             ),
@@ -94,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
       height: 65.0,
       child: FloatingActionButton(
         onPressed: _showNewItemChooser,
-        child: Icon(Icons.add, size: 32.0),
         elevation: 2.0,
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 32.0),
       ),
     );
   }
@@ -110,14 +115,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showNewItemChooser() {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
         return NewItemChooser(
-          onItemSelected: (String item) {
+          vault: Vault.vault,
+          onItemSelected: (Template item) {
             // Handle the selected item
-            print('Selected: $item');
+            print('Selected: $item.title');
             // Add your logic here to handle the selected item
           },
         );
@@ -128,36 +134,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Simple page widgets
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Home Page', style: TextStyle(fontSize: 24)),
     );
   }
 }
 
 class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Search Page', style: TextStyle(fontSize: 24)),
     );
   }
 }
 
 class NotificationsPage extends StatelessWidget {
+  const NotificationsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Notifications Page', style: TextStyle(fontSize: 24)),
     );
   }
 }
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Profile Page', style: TextStyle(fontSize: 24)),
     );
   }

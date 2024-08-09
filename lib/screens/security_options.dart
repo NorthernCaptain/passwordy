@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/service/db_vault.dart';
 import 'package:passwordy/service/log.dart';
+import 'package:passwordy/screens/home_screen.dart';
 
 class SecurityOptionsScreen extends StatefulWidget {
   final String masterPassword;
 
-  SecurityOptionsScreen({required this.masterPassword});
+  const SecurityOptionsScreen({super.key, required this.masterPassword});
 
   @override
   _SecurityOptionsScreenState createState() => _SecurityOptionsScreenState();
@@ -78,11 +79,11 @@ class _SecurityOptionsScreenState extends State<SecurityOptionsScreen> {
               ),
               const Spacer(),
               ElevatedButton(
-                child: const Text('Continue'),
                 onPressed: _onContinuePressed,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
+                child: const Text('Continue'),
               ),
               const SizedBox(height: 24),
             ],
@@ -134,15 +135,19 @@ class _SecurityOptionsScreenState extends State<SecurityOptionsScreen> {
       }
     }
 
-    // If biometrics are not enabled or after successful biometric setup
-    // Navigate to the next screen or home screen
-    // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => NextScreen()));
     await nextScreen();
   }
 
   Future<void> nextScreen() async {
-    Vault dbVault = DBVault();
+    Vault dbVault = Vault.vault;
     final result = await dbVault.openDB();
     lg?.i('DB opened: $result');
+    if (!result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text('Password does not match'), backgroundColor: Theme.of(context).colorScheme.error),
+      );
+      return;
+    }
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
 }

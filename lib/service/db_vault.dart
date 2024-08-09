@@ -5,12 +5,14 @@ import 'package:passwordy/service/log.dart';
 
 abstract class Vault {
   static const String masterDB = 'master.edb';
+  static Vault vault = DBVault();
   static Future<bool> exists(String name) async {
     var exists = await databaseExists(name);
     return exists;
   }
 
   Future<bool> openDB({String name = Vault.masterDB});
+  Future<List<Template>> getActiveTemplates();
 }
 
 class DBVault implements Vault {
@@ -32,5 +34,11 @@ class DBVault implements Vault {
       return false;
     }
     return true;
+  }
+
+  @override
+  Future<List<Template>> getActiveTemplates() async {
+    final templates = await _db?.getActiveTemplates() ?? [];
+    return templates;
   }
 }

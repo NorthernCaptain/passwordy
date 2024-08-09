@@ -1,17 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:passwordy/service/db_vault.dart';
+import 'package:passwordy/service/database.dart';
+import 'package:passwordy/service/icon_mapping.dart';
 
-class NewItemChooser extends StatelessWidget {
-  final Function(String) onItemSelected;
+class NewItemChooser extends StatefulWidget {
+  final Function(Template) onItemSelected;
+  final Vault vault;
 
-  const NewItemChooser({Key? key, required this.onItemSelected}) : super(key: key);
+  const NewItemChooser(
+      {super.key, required this.onItemSelected, required this.vault});
+
+  @override
+  _NewItemChooserState createState() => _NewItemChooserState();
+}
+
+class _NewItemChooserState extends State<NewItemChooser> {
+  Future<List<Template>>? templates;
+
+  @override
+  initState() {
+    super.initState();
+    setState(() {
+      templates = widget.vault.getActiveTemplates();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.6, // 60% of screen height
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(
         children: <Widget>[
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Container(
             width: 40,
             height: 5,
@@ -20,33 +41,30 @@ class NewItemChooser extends StatelessWidget {
               borderRadius: BorderRadius.circular(2.5),
             ),
           ),
-          SizedBox(height: 20),
-          Text(
+          const SizedBox(height: 20),
+          const Text(
             'Add New',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
-            child: ListView(
-              children: [
-                _buildItem(context, Icons.note_add, 'Add Note'),
-                _buildItem(context, Icons.photo_camera, 'Take Photo'),
-                _buildItem(context, Icons.photo_library, 'Add from Gallery'),
-                _buildItem(context, Icons.file_upload, 'Upload File'),
-                _buildItem(context, Icons.link, 'Add Link'),
-                _buildItem(context, Icons.list, 'Create List'),
-                _buildItem(context, Icons.event, 'Add Event'),
-                _buildItem(context, Icons.location_on, 'Add Location'),
-                _buildItem(context, Icons.note_add, 'Add Note'),
-                _buildItem(context, Icons.photo_camera, 'Take Photo'),
-                _buildItem(context, Icons.photo_library, 'Add from Gallery'),
-                _buildItem(context, Icons.file_upload, 'Upload File'),
-                _buildItem(context, Icons.link, 'Add Link'),
-                _buildItem(context, Icons.list, 'Create List'),
-                _buildItem(context, Icons.event, 'Add Event'),
-                _buildItem(context, Icons.location_on, 'Add Location'),
-                // Add more items as needed
-              ],
+            child:
+            FutureBuilder<List<Template>>(
+              future: templates,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final results = snapshot.data!;
+
+                  return ListView.builder(
+                    itemCount: results.length,
+                    itemBuilder: (context, index) {
+                      return _buildItem(context, results[index]);
+                    },
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
             ),
           ),
         ],
@@ -54,13 +72,13 @@ class NewItemChooser extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(BuildContext context, IconData icon, String label) {
+  Widget _buildItem(BuildContext context, Template template) {
     return ListTile(
-      leading: Icon(icon),
-      title: Text(label),
+      leading: Icon(IconMapping.iconMap[template.icon] ?? Icons.no_encryption),
+      title: Text(template.title),
       onTap: () {
         Navigator.pop(context);
-        onItemSelected(label);
+        widget.onItemSelected(template);
       },
     );
   }
