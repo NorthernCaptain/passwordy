@@ -6,6 +6,7 @@ class PasswordTextField extends StatefulWidget {
   final String? labelText;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final void Function(String)? onSubmitted;
 
   const PasswordTextField({
     super.key,
@@ -14,6 +15,7 @@ class PasswordTextField extends StatefulWidget {
     this.labelText,
     this.validator,
     this.onChanged,
+    this.onSubmitted,
   });
 
   @override
@@ -48,6 +50,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
       ),
       validator: widget.validator,
       onChanged: widget.onChanged,
+      onFieldSubmitted: widget.onSubmitted,
     );
   }
 }

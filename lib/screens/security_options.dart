@@ -3,6 +3,7 @@ import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/service/db_vault.dart';
 import 'package:passwordy/service/log.dart';
 import 'package:passwordy/screens/home_screen.dart';
+import 'package:passwordy/service/utils.dart';
 
 class SecurityOptionsScreen extends StatefulWidget {
   final String masterPassword;
@@ -126,9 +127,7 @@ class _SecurityOptionsScreenState extends State<SecurityOptionsScreen> {
         // Navigate to the next screen or home screen
       } else {
         // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Biometric authentication failed')),
-        );
+        snackError(context, 'Biometric authentication failed');
         await _authService.disableBiometrics();
         await _checkBiometricsStatus();
         return;
@@ -143,9 +142,7 @@ class _SecurityOptionsScreenState extends State<SecurityOptionsScreen> {
     final result = await dbVault.openDB();
     lg?.i('DB opened: $result');
     if (!result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Password does not match'), backgroundColor: Theme.of(context).colorScheme.error),
-      );
+      snackError(context, 'Incorrect password');
       return;
     }
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));

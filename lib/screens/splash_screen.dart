@@ -19,8 +19,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _checkAuth() async {
-    // Simulate a delay to show splash screen (remove in production)
-    await Future.delayed(const Duration(seconds: 2));
     var service = AuthService();
 
     var authState = await service.loginState();

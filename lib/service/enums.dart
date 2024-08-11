@@ -12,4 +12,5 @@ enum FieldType {
   dateTime,
   note,
   url,
+  token // OTP, TOTP, HOTP
 }

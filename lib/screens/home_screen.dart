@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:passwordy/screens/vault_list_screen.dart';
 import 'package:passwordy/service/log.dart';
-import 'package:passwordy/service/db_vault.dart';
-import 'package:passwordy/service/database.dart';
+import 'package:passwordy/service/utils.dart';
+import 'package:passwordy/widgets/add_options_state.dart';
 import 'package:passwordy/widgets/nav_item.dart';
-import 'package:passwordy/widgets/new_item_chooser.dart';
-import 'package:passwordy/widgets/search_widget.dart';
 import 'package:passwordy/screens/totp_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,8 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const HomePage(),
-    const AuthenticatorScreen(),
+    VaultListScreen(),
+    AuthenticatorScreen(),
     const NotificationsPage(),
     const ProfilePage(),
   ];
@@ -35,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: Column(
             children: [
-              SearchWidget(onSearch: _handleSearch),
               Expanded(
                 child: _pages[_selectedIndex],
               ),
@@ -49,16 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _handleSearch(String query) {
-    lg?.i('Searching for: $query');
-  }
-
   Widget _buildBottomAppBar() {
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
+      padding: const EdgeInsets.symmetric(horizontal: 0),
       child: SizedBox(
-        height: 80.0,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -95,10 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildMiddleButton() {
     return SizedBox(
-      width: 65.0,
-      height: 65.0,
+      width: 60.0,
+      height: 60.0,
       child: FloatingActionButton(
-        onPressed: _showNewItemChooser,
+        onPressed: _showAddOptions,
         elevation: 2.0,
         shape: const CircleBorder(),
         child: const Icon(Icons.add, size: 32.0),
@@ -112,23 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _showNewItemChooser() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return NewItemChooser(
-          vault: Vault.vault,
-          onItemSelected: (Template item) {
-            // Handle the selected item
-            print('Selected: $item.title');
-            // Add your logic here to handle the selected item
-          },
-        );
-      },
-    );
+  void _showAddOptions() {
+    _pages[_selectedIndex].asOrNull<AddOptionsWidget>()?.showAddOptions(context);
   }
 }
 
@@ -140,17 +119,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text('Home Page', style: TextStyle(fontSize: 24)),
-    );
-  }
-}
-
-class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Search Page', style: TextStyle(fontSize: 24)),
     );
   }
 }

@@ -30,8 +30,8 @@ class CircularNavItem extends StatelessWidget {
             customBorder: const CircleBorder(),
             onTap: onTap,
             child: SizedBox(
-              width: 70,
-              height: 70,
+              width: 66,
+              height: 66,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

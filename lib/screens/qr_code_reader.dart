@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:passwordy/service/utils.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io';
 import 'package:passwordy/service/totp.dart';
+import 'package:passwordy/service/log.dart';
 
 class QRViewReader extends StatefulWidget {
+  final Function(OTPEntry) onQRScanned;
+  const QRViewReader({super.key, required this.onQRScanned});
   @override
   State<StatefulWidget> createState() => _QRViewReaderState();
 }
@@ -11,6 +15,7 @@ class QRViewReader extends StatefulWidget {
 class _QRViewReaderState extends State<QRViewReader> {
   Barcode? result;
   QRViewController? controller;
+  bool scanComplete = false;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
@@ -32,7 +37,7 @@ class _QRViewReaderState extends State<QRViewReader> {
             top: 40,
             right: 16,
             child: IconButton(
-              icon: Icon(Icons.close, color: Colors.white),
+              icon: const Icon(Icons.close, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -67,7 +72,7 @@ class _QRViewReaderState extends State<QRViewReader> {
 
   Widget _buildControls() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -118,46 +123,26 @@ class _QRViewReaderState extends State<QRViewReader> {
   }
 
   void _processQRResult(String qrCode) {
-    try {
-      Uri uri = Uri.parse(qrCode);
-      if (uri.scheme == 'otpauth' && uri.host == 'totp') {
-        String siteName = uri.queryParameters['issuer'] ?? 'Unknown';
-        String secret = uri.queryParameters['secret'] ?? '';
-
-        if (secret.isNotEmpty) {
-          TOTPEntry totp = TOTPEntry(siteName: siteName, secret: secret);
-          try {
-            totp.generateTOTP();
-          } catch (e) {
-            _showInvalidQRCodeSnackBar('Invalid TOTP secret');
-            return;
-          }
-          Navigator.pop(context, {'siteName': siteName, 'secret': secret});
-        } else {
-          _showInvalidQRCodeSnackBar('Invalid TOTP secret');
-        }
-      } else {
-        _showInvalidQRCodeSnackBar('Invalid QR code format');
-      }
-    } catch (e) {
-      _showInvalidQRCodeSnackBar('Unable to parse QR code');
+    lg?.i("Scanned QR code: $qrCode");
+    if (scanComplete) {
+      return;
     }
-  }
-
-  void _showInvalidQRCodeSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    try {
+      OTPEntry entry = OTPEntry.fromUri(Uri.parse(qrCode));
+      lg?.i('CHECK Generated TOTP URI: ${entry.toUri().toString()}');
+      Navigator.pop(context);
+      scanComplete = true;
+      widget.onQRScanned(entry);
+    } catch (e) {
+      snackError(context, 'Invalid OTP secret');
+      lg?.e("Invalid QR code: $qrCode", error: e);
+      return;
+    }
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     if (!p) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No camera permission')),
-      );
+      snackError(context, 'No camera permission');
     }
   }
 

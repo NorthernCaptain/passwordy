@@ -3,6 +3,7 @@ import 'package:passwordy/screens/home_screen.dart';
 import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/service/db_vault.dart';
 import 'package:passwordy/service/log.dart';
+import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/password_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,9 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Vault dbVault = Vault.vault;
     final result = await dbVault.openDB();
     if(!result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Password does not match'), backgroundColor: Theme.of(context).colorScheme.error),
-      );
+      snackError(context, 'Password does not match');
       return;
     }
     lg?.i('DB opened: $result');
@@ -109,7 +108,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              PasswordTextField(controller: _passwordController, hintText: 'Enter your master password', labelText: "Master password",),
+              PasswordTextField(controller: _passwordController,
+                hintText: 'Enter your master password',
+                labelText: "Master password",
+                onSubmitted: (_) => _onContinuePressed(),
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _onContinuePressed,

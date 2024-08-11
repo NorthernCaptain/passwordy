@@ -47,7 +47,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).colorScheme.surfaceBright,
           contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
         ),
         onSubmitted: (value) {

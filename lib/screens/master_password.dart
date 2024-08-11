@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/screens/security_options.dart';
 import 'package:passwordy/service/auth_service.dart';
+import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/password_field.dart';
 
 class MasterPasswordScreen extends StatefulWidget {
@@ -92,15 +93,11 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen> {
 
   void _onContinuePressed() {
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      snackError(context, 'Passwords do not match');
       return;
     }
     if (_passwordStrength < 0.5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please choose a stronger password')),
-      );
+      snackError(context, 'Please choose a stronger password');
       return;
     }
     AuthService().setCurrentPassword(_passwordController.text);
