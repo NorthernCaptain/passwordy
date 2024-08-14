@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/open.dart';
 import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 import 'package:path/path.dart' as p;
+import 'package:passwordy/service/db/template_dao.dart';
+import 'package:passwordy/service/db/datavalues_dao.dart';
 
 part 'database.g.dart';
 
@@ -65,6 +67,11 @@ class SetupValues extends Table {
   TextColumn get value => text()();
 }
 
+// This is the main table that stores the template headers
+// When the user creates a secret based on this template
+// the template is cloned and isData set to true
+// then DataValues is used to store the secret values with reference to the template
+// and it's details
 class Templates extends Table {
   TextColumn get id => text().clientDefault(() => generateId())();
 
@@ -73,6 +80,8 @@ class Templates extends Table {
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
   BoolColumn get isVisible => boolean().withDefault(const Constant(true))();
+  // If the template is a data template, it will be used to store secret values
+  BoolColumn get isData => boolean().withDefault(const Constant(false))();
 
   TextColumn get title => text()();
   TextColumn get category => text().nullable()();
@@ -94,7 +103,21 @@ class TemplateDetails extends Table {
   TextColumn get templateId => text().references(Templates, #id)();
 }
 
-@DriftDatabase(tables: [SetupValues, TemplateDetails, Templates])
+class DataValues extends Table {
+  TextColumn get id => text().clientDefault(() => generateId())();
+  @override
+  Set<Column> get primaryKey => {id};
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get value => text()();
+
+  TextColumn get templateId => text().references(Templates, #id)();
+  TextColumn get templateDetailId => text().references(TemplateDetails, #id)();
+}
+
+
+@DriftDatabase(tables: [SetupValues, TemplateDetails, Templates, DataValues], daos: [TemplateDao, DataValuesDao])
 class VaultDatabase extends _$VaultDatabase {
   final String dbName;
 
@@ -110,71 +133,8 @@ class VaultDatabase extends _$VaultDatabase {
       beforeOpen: (details) async {},
       onCreate: (Migrator m) async {
         await m.createAll();
-        await _insertDefaults();
+        await templateDao.insertDefaults();
       },
     );
-  }
-
-  Future<void> _insertDefaults() async {
-    await insertTemplate(
-      TemplatesCompanion.insert(title: "Email account", icon: "email", color: "#1010F0", sort: 1)
-      , [
-        TemplateDetailsCompanion.insert(title: "Email", fieldType: FieldType.email, sort: 1, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Password", fieldType: FieldType.password, sort: 2, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Website", fieldType: FieldType.url, sort: 3, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "User name", fieldType: FieldType.text, sort: 4, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Notes", fieldType: FieldType.note, sort: 5, templateId: ''),
-      ],
-    );
-    await insertTemplate(
-      TemplatesCompanion.insert(title: "Web site", icon: "web", color: "#10F010", sort: 2)
-      , [
-        TemplateDetailsCompanion.insert(title: "Website", fieldType: FieldType.url, sort: 1, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "User name", fieldType: FieldType.text, sort: 2, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Password", fieldType: FieldType.password, sort: 3, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Email", fieldType: FieldType.email, sort: 4, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Notes", fieldType: FieldType.note, sort: 5, templateId: ''),
-      ],
-    );
-    await insertTemplate(
-      TemplatesCompanion.insert(title: "Credit card", icon: "credit_card", color: "#F01010", sort: 3)
-      , [
-        TemplateDetailsCompanion.insert(title: "Bank", fieldType: FieldType.capText, sort: 1, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Card number", fieldType: FieldType.number, sort: 2, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Pin-code", fieldType: FieldType.pinCode, sort: 3, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Phone", fieldType: FieldType.phone, sort: 4, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Notes", fieldType: FieldType.note, sort: 5, templateId: ''),
-      ],
-    );
-    await insertTemplate(
-      TemplatesCompanion.insert(title: "Bank account", icon: "account_balance", color: "#F0F010", sort: 3)
-      , [
-        TemplateDetailsCompanion.insert(title: "Bank", fieldType: FieldType.capText, sort: 1, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Route number", fieldType: FieldType.number, sort: 2, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Account number", fieldType: FieldType.number, sort: 3, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Phone", fieldType: FieldType.phone, sort: 4, templateId: ''),
-        TemplateDetailsCompanion.insert(title: "Notes", fieldType: FieldType.note, sort: 5, templateId: ''),
-      ],
-    );
-  }
-
-  Future<Template> insertTemplate(
-      TemplatesCompanion template,
-      List<TemplateDetailsCompanion> details
-      ) async {
-    final Template row = await into(templates).insertReturning(template);
-    for (final detail in details) {
-      await into(templateDetails).insert(
-        detail.copyWith(templateId: Value(row.id)),
-      );
-    }
-    return row;
-  }
-  
-  Future<List<Template>> getActiveTemplates() async {
-    return
-      (select(templates)
-        ..where((t) => t.isVisible.equals(true) & t.isDeleted.equals(false))
-        ..orderBy([(t) => OrderingTerm(expression: t.sort)])).get();
   }
 }

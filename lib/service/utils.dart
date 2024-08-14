@@ -16,6 +16,20 @@ extension AsExtension on Object? {
   }
 }
 
+extension ColorExtension on Color {
+  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
+  static Color fromString(String colorString) {
+    final buffer = StringBuffer();
+    if (colorString.length == 6 || colorString.length == 7) buffer.write('ff');
+    buffer.write(colorString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  bool isLightColor() {
+    return computeLuminance() > 0.5;
+  }
+}
+
 snackError(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),

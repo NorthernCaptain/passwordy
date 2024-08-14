@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passwordy/service/db_vault.dart';
-import 'package:passwordy/service/database.dart';
-import 'package:passwordy/service/icon_mapping.dart';
+import 'package:passwordy/screens/add_secret_screen.dart';
+import 'package:passwordy/service/db/db_vault.dart';
+import 'package:passwordy/service/db/database.dart';
+import 'package:passwordy/widgets/circle_icon.dart';
 
 class NewItemChooser extends StatefulWidget {
   final Function(Template) onItemSelected;
@@ -74,11 +75,12 @@ class _NewItemChooserState extends State<NewItemChooser> {
 
   Widget _buildItem(BuildContext context, Template template) {
     return ListTile(
-      leading: Icon(IconMapping.iconMap[template.icon] ?? Icons.no_encryption),
+      leading: CircleIcon(iconName: template.icon, backgroundColor: template.color),
       title: Text(template.title),
       onTap: () {
         Navigator.pop(context);
         widget.onItemSelected(template);
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: template)));
       },
     );
   }

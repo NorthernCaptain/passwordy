@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/screens/home_screen.dart';
 import 'package:passwordy/service/auth_service.dart';
-import 'package:passwordy/service/db_vault.dart';
+import 'package:passwordy/service/db/db_vault.dart';
 import 'package:passwordy/service/log.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/password_field.dart';

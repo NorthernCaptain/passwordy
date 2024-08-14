@@ -257,6 +257,15 @@ class $TemplatesTable extends Templates
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_visible" IN (0, 1))'),
       defaultValue: const Constant(true));
+  static const VerificationMeta _isDataMeta = const VerificationMeta('isData');
+  @override
+  late final GeneratedColumn<bool> isData = GeneratedColumn<bool>(
+      'is_data', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_data" IN (0, 1))'),
+      defaultValue: const Constant(false));
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -284,8 +293,18 @@ class $TemplatesTable extends Templates
       'sort', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, updatedAt, isDeleted, isVisible, title, category, icon, color, sort];
+  List<GeneratedColumn> get $columns => [
+        id,
+        updatedAt,
+        isDeleted,
+        isVisible,
+        isData,
+        title,
+        category,
+        icon,
+        color,
+        sort
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -310,6 +329,10 @@ class $TemplatesTable extends Templates
     if (data.containsKey('is_visible')) {
       context.handle(_isVisibleMeta,
           isVisible.isAcceptableOrUnknown(data['is_visible']!, _isVisibleMeta));
+    }
+    if (data.containsKey('is_data')) {
+      context.handle(_isDataMeta,
+          isData.isAcceptableOrUnknown(data['is_data']!, _isDataMeta));
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -356,6 +379,8 @@ class $TemplatesTable extends Templates
           .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
       isVisible: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_visible'])!,
+      isData: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_data'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       category: attachedDatabase.typeMapping
@@ -380,6 +405,7 @@ class Template extends DataClass implements Insertable<Template> {
   final DateTime updatedAt;
   final bool isDeleted;
   final bool isVisible;
+  final bool isData;
   final String title;
   final String? category;
   final String icon;
@@ -390,6 +416,7 @@ class Template extends DataClass implements Insertable<Template> {
       required this.updatedAt,
       required this.isDeleted,
       required this.isVisible,
+      required this.isData,
       required this.title,
       this.category,
       required this.icon,
@@ -402,6 +429,7 @@ class Template extends DataClass implements Insertable<Template> {
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_deleted'] = Variable<bool>(isDeleted);
     map['is_visible'] = Variable<bool>(isVisible);
+    map['is_data'] = Variable<bool>(isData);
     map['title'] = Variable<String>(title);
     if (!nullToAbsent || category != null) {
       map['category'] = Variable<String>(category);
@@ -418,6 +446,7 @@ class Template extends DataClass implements Insertable<Template> {
       updatedAt: Value(updatedAt),
       isDeleted: Value(isDeleted),
       isVisible: Value(isVisible),
+      isData: Value(isData),
       title: Value(title),
       category: category == null && nullToAbsent
           ? const Value.absent()
@@ -436,6 +465,7 @@ class Template extends DataClass implements Insertable<Template> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isDeleted: serializer.fromJson<bool>(json['isDeleted']),
       isVisible: serializer.fromJson<bool>(json['isVisible']),
+      isData: serializer.fromJson<bool>(json['isData']),
       title: serializer.fromJson<String>(json['title']),
       category: serializer.fromJson<String?>(json['category']),
       icon: serializer.fromJson<String>(json['icon']),
@@ -451,6 +481,7 @@ class Template extends DataClass implements Insertable<Template> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isDeleted': serializer.toJson<bool>(isDeleted),
       'isVisible': serializer.toJson<bool>(isVisible),
+      'isData': serializer.toJson<bool>(isData),
       'title': serializer.toJson<String>(title),
       'category': serializer.toJson<String?>(category),
       'icon': serializer.toJson<String>(icon),
@@ -464,6 +495,7 @@ class Template extends DataClass implements Insertable<Template> {
           DateTime? updatedAt,
           bool? isDeleted,
           bool? isVisible,
+          bool? isData,
           String? title,
           Value<String?> category = const Value.absent(),
           String? icon,
@@ -474,6 +506,7 @@ class Template extends DataClass implements Insertable<Template> {
         updatedAt: updatedAt ?? this.updatedAt,
         isDeleted: isDeleted ?? this.isDeleted,
         isVisible: isVisible ?? this.isVisible,
+        isData: isData ?? this.isData,
         title: title ?? this.title,
         category: category.present ? category.value : this.category,
         icon: icon ?? this.icon,
@@ -486,6 +519,7 @@ class Template extends DataClass implements Insertable<Template> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
       isVisible: data.isVisible.present ? data.isVisible.value : this.isVisible,
+      isData: data.isData.present ? data.isData.value : this.isData,
       title: data.title.present ? data.title.value : this.title,
       category: data.category.present ? data.category.value : this.category,
       icon: data.icon.present ? data.icon.value : this.icon,
@@ -501,6 +535,7 @@ class Template extends DataClass implements Insertable<Template> {
           ..write('updatedAt: $updatedAt, ')
           ..write('isDeleted: $isDeleted, ')
           ..write('isVisible: $isVisible, ')
+          ..write('isData: $isData, ')
           ..write('title: $title, ')
           ..write('category: $category, ')
           ..write('icon: $icon, ')
@@ -511,8 +546,8 @@ class Template extends DataClass implements Insertable<Template> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, updatedAt, isDeleted, isVisible, title, category, icon, color, sort);
+  int get hashCode => Object.hash(id, updatedAt, isDeleted, isVisible, isData,
+      title, category, icon, color, sort);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -521,6 +556,7 @@ class Template extends DataClass implements Insertable<Template> {
           other.updatedAt == this.updatedAt &&
           other.isDeleted == this.isDeleted &&
           other.isVisible == this.isVisible &&
+          other.isData == this.isData &&
           other.title == this.title &&
           other.category == this.category &&
           other.icon == this.icon &&
@@ -533,6 +569,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
   final Value<DateTime> updatedAt;
   final Value<bool> isDeleted;
   final Value<bool> isVisible;
+  final Value<bool> isData;
   final Value<String> title;
   final Value<String?> category;
   final Value<String> icon;
@@ -544,6 +581,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
     this.updatedAt = const Value.absent(),
     this.isDeleted = const Value.absent(),
     this.isVisible = const Value.absent(),
+    this.isData = const Value.absent(),
     this.title = const Value.absent(),
     this.category = const Value.absent(),
     this.icon = const Value.absent(),
@@ -556,6 +594,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
     this.updatedAt = const Value.absent(),
     this.isDeleted = const Value.absent(),
     this.isVisible = const Value.absent(),
+    this.isData = const Value.absent(),
     required String title,
     this.category = const Value.absent(),
     required String icon,
@@ -571,6 +610,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
     Expression<DateTime>? updatedAt,
     Expression<bool>? isDeleted,
     Expression<bool>? isVisible,
+    Expression<bool>? isData,
     Expression<String>? title,
     Expression<String>? category,
     Expression<String>? icon,
@@ -583,6 +623,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isDeleted != null) 'is_deleted': isDeleted,
       if (isVisible != null) 'is_visible': isVisible,
+      if (isData != null) 'is_data': isData,
       if (title != null) 'title': title,
       if (category != null) 'category': category,
       if (icon != null) 'icon': icon,
@@ -597,6 +638,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
       Value<DateTime>? updatedAt,
       Value<bool>? isDeleted,
       Value<bool>? isVisible,
+      Value<bool>? isData,
       Value<String>? title,
       Value<String?>? category,
       Value<String>? icon,
@@ -608,6 +650,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
       isVisible: isVisible ?? this.isVisible,
+      isData: isData ?? this.isData,
       title: title ?? this.title,
       category: category ?? this.category,
       icon: icon ?? this.icon,
@@ -631,6 +674,9 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
     }
     if (isVisible.present) {
       map['is_visible'] = Variable<bool>(isVisible.value);
+    }
+    if (isData.present) {
+      map['is_data'] = Variable<bool>(isData.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -660,6 +706,7 @@ class TemplatesCompanion extends UpdateCompanion<Template> {
           ..write('updatedAt: $updatedAt, ')
           ..write('isDeleted: $isDeleted, ')
           ..write('isVisible: $isVisible, ')
+          ..write('isData: $isData, ')
           ..write('title: $title, ')
           ..write('category: $category, ')
           ..write('icon: $icon, ')
@@ -1064,6 +1111,364 @@ class TemplateDetailsCompanion extends UpdateCompanion<TemplateDetail> {
   }
 }
 
+class $DataValuesTable extends DataValues
+    with TableInfo<$DataValuesTable, DataValue> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DataValuesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => generateId());
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+      'value', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _templateIdMeta =
+      const VerificationMeta('templateId');
+  @override
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+      'template_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES templates (id)'));
+  static const VerificationMeta _templateDetailIdMeta =
+      const VerificationMeta('templateDetailId');
+  @override
+  late final GeneratedColumn<String> templateDetailId = GeneratedColumn<String>(
+      'template_detail_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES template_details (id)'));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, updatedAt, isDeleted, value, templateId, templateDetailId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'data_values';
+  @override
+  VerificationContext validateIntegrity(Insertable<DataValue> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+          _valueMeta, value.isAcceptableOrUnknown(data['value']!, _valueMeta));
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+          _templateIdMeta,
+          templateId.isAcceptableOrUnknown(
+              data['template_id']!, _templateIdMeta));
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('template_detail_id')) {
+      context.handle(
+          _templateDetailIdMeta,
+          templateDetailId.isAcceptableOrUnknown(
+              data['template_detail_id']!, _templateDetailIdMeta));
+    } else if (isInserting) {
+      context.missing(_templateDetailIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DataValue map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DataValue(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      value: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}value'])!,
+      templateId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}template_id'])!,
+      templateDetailId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}template_detail_id'])!,
+    );
+  }
+
+  @override
+  $DataValuesTable createAlias(String alias) {
+    return $DataValuesTable(attachedDatabase, alias);
+  }
+}
+
+class DataValue extends DataClass implements Insertable<DataValue> {
+  final String id;
+  final DateTime updatedAt;
+  final bool isDeleted;
+  final String value;
+  final String templateId;
+  final String templateDetailId;
+  const DataValue(
+      {required this.id,
+      required this.updatedAt,
+      required this.isDeleted,
+      required this.value,
+      required this.templateId,
+      required this.templateDetailId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['value'] = Variable<String>(value);
+    map['template_id'] = Variable<String>(templateId);
+    map['template_detail_id'] = Variable<String>(templateDetailId);
+    return map;
+  }
+
+  DataValuesCompanion toCompanion(bool nullToAbsent) {
+    return DataValuesCompanion(
+      id: Value(id),
+      updatedAt: Value(updatedAt),
+      isDeleted: Value(isDeleted),
+      value: Value(value),
+      templateId: Value(templateId),
+      templateDetailId: Value(templateDetailId),
+    );
+  }
+
+  factory DataValue.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DataValue(
+      id: serializer.fromJson<String>(json['id']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      value: serializer.fromJson<String>(json['value']),
+      templateId: serializer.fromJson<String>(json['templateId']),
+      templateDetailId: serializer.fromJson<String>(json['templateDetailId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'value': serializer.toJson<String>(value),
+      'templateId': serializer.toJson<String>(templateId),
+      'templateDetailId': serializer.toJson<String>(templateDetailId),
+    };
+  }
+
+  DataValue copyWith(
+          {String? id,
+          DateTime? updatedAt,
+          bool? isDeleted,
+          String? value,
+          String? templateId,
+          String? templateDetailId}) =>
+      DataValue(
+        id: id ?? this.id,
+        updatedAt: updatedAt ?? this.updatedAt,
+        isDeleted: isDeleted ?? this.isDeleted,
+        value: value ?? this.value,
+        templateId: templateId ?? this.templateId,
+        templateDetailId: templateDetailId ?? this.templateDetailId,
+      );
+  DataValue copyWithCompanion(DataValuesCompanion data) {
+    return DataValue(
+      id: data.id.present ? data.id.value : this.id,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      value: data.value.present ? data.value.value : this.value,
+      templateId:
+          data.templateId.present ? data.templateId.value : this.templateId,
+      templateDetailId: data.templateDetailId.present
+          ? data.templateDetailId.value
+          : this.templateDetailId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DataValue(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('value: $value, ')
+          ..write('templateId: $templateId, ')
+          ..write('templateDetailId: $templateDetailId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, updatedAt, isDeleted, value, templateId, templateDetailId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DataValue &&
+          other.id == this.id &&
+          other.updatedAt == this.updatedAt &&
+          other.isDeleted == this.isDeleted &&
+          other.value == this.value &&
+          other.templateId == this.templateId &&
+          other.templateDetailId == this.templateDetailId);
+}
+
+class DataValuesCompanion extends UpdateCompanion<DataValue> {
+  final Value<String> id;
+  final Value<DateTime> updatedAt;
+  final Value<bool> isDeleted;
+  final Value<String> value;
+  final Value<String> templateId;
+  final Value<String> templateDetailId;
+  final Value<int> rowid;
+  const DataValuesCompanion({
+    this.id = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.value = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.templateDetailId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DataValuesCompanion.insert({
+    this.id = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    required String value,
+    required String templateId,
+    required String templateDetailId,
+    this.rowid = const Value.absent(),
+  })  : value = Value(value),
+        templateId = Value(templateId),
+        templateDetailId = Value(templateDetailId);
+  static Insertable<DataValue> custom({
+    Expression<String>? id,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? isDeleted,
+    Expression<String>? value,
+    Expression<String>? templateId,
+    Expression<String>? templateDetailId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (value != null) 'value': value,
+      if (templateId != null) 'template_id': templateId,
+      if (templateDetailId != null) 'template_detail_id': templateDetailId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DataValuesCompanion copyWith(
+      {Value<String>? id,
+      Value<DateTime>? updatedAt,
+      Value<bool>? isDeleted,
+      Value<String>? value,
+      Value<String>? templateId,
+      Value<String>? templateDetailId,
+      Value<int>? rowid}) {
+    return DataValuesCompanion(
+      id: id ?? this.id,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      value: value ?? this.value,
+      templateId: templateId ?? this.templateId,
+      templateDetailId: templateDetailId ?? this.templateDetailId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (templateDetailId.present) {
+      map['template_detail_id'] = Variable<String>(templateDetailId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DataValuesCompanion(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('value: $value, ')
+          ..write('templateId: $templateId, ')
+          ..write('templateDetailId: $templateDetailId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$VaultDatabase extends GeneratedDatabase {
   _$VaultDatabase(QueryExecutor e) : super(e);
   $VaultDatabaseManager get managers => $VaultDatabaseManager(this);
@@ -1071,12 +1476,15 @@ abstract class _$VaultDatabase extends GeneratedDatabase {
   late final $TemplatesTable templates = $TemplatesTable(this);
   late final $TemplateDetailsTable templateDetails =
       $TemplateDetailsTable(this);
+  late final $DataValuesTable dataValues = $DataValuesTable(this);
+  late final TemplateDao templateDao = TemplateDao(this as VaultDatabase);
+  late final DataValuesDao dataValuesDao = DataValuesDao(this as VaultDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [setupValues, templates, templateDetails];
+      [setupValues, templates, templateDetails, dataValues];
 }
 
 typedef $$SetupValuesTableCreateCompanionBuilder = SetupValuesCompanion
@@ -1174,6 +1582,7 @@ typedef $$TemplatesTableCreateCompanionBuilder = TemplatesCompanion Function({
   Value<DateTime> updatedAt,
   Value<bool> isDeleted,
   Value<bool> isVisible,
+  Value<bool> isData,
   required String title,
   Value<String?> category,
   required String icon,
@@ -1186,6 +1595,7 @@ typedef $$TemplatesTableUpdateCompanionBuilder = TemplatesCompanion Function({
   Value<DateTime> updatedAt,
   Value<bool> isDeleted,
   Value<bool> isVisible,
+  Value<bool> isData,
   Value<String> title,
   Value<String?> category,
   Value<String> icon,
@@ -1215,6 +1625,7 @@ class $$TemplatesTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<bool> isDeleted = const Value.absent(),
             Value<bool> isVisible = const Value.absent(),
+            Value<bool> isData = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String?> category = const Value.absent(),
             Value<String> icon = const Value.absent(),
@@ -1227,6 +1638,7 @@ class $$TemplatesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             isDeleted: isDeleted,
             isVisible: isVisible,
+            isData: isData,
             title: title,
             category: category,
             icon: icon,
@@ -1239,6 +1651,7 @@ class $$TemplatesTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<bool> isDeleted = const Value.absent(),
             Value<bool> isVisible = const Value.absent(),
+            Value<bool> isData = const Value.absent(),
             required String title,
             Value<String?> category = const Value.absent(),
             required String icon,
@@ -1251,6 +1664,7 @@ class $$TemplatesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             isDeleted: isDeleted,
             isVisible: isVisible,
+            isData: isData,
             title: title,
             category: category,
             icon: icon,
@@ -1281,6 +1695,11 @@ class $$TemplatesTableFilterComposer
 
   ColumnFilters<bool> get isVisible => $state.composableBuilder(
       column: $state.table.isVisible,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isData => $state.composableBuilder(
+      column: $state.table.isData,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1322,6 +1741,19 @@ class $$TemplatesTableFilterComposer
                     $state.db.templateDetails, joinBuilder, parentComposers)));
     return f(composer);
   }
+
+  ComposableFilter dataValuesRefs(
+      ComposableFilter Function($$DataValuesTableFilterComposer f) f) {
+    final $$DataValuesTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $state.db.dataValues,
+        getReferencedColumn: (t) => t.templateId,
+        builder: (joinBuilder, parentComposers) =>
+            $$DataValuesTableFilterComposer(ComposerState($state.db,
+                $state.db.dataValues, joinBuilder, parentComposers)));
+    return f(composer);
+  }
 }
 
 class $$TemplatesTableOrderingComposer
@@ -1344,6 +1776,11 @@ class $$TemplatesTableOrderingComposer
 
   ColumnOrderings<bool> get isVisible => $state.composableBuilder(
       column: $state.table.isVisible,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isData => $state.composableBuilder(
+      column: $state.table.isData,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -1502,6 +1939,19 @@ class $$TemplateDetailsTableFilterComposer
                 $state.db, $state.db.templates, joinBuilder, parentComposers)));
     return composer;
   }
+
+  ComposableFilter dataValuesRefs(
+      ComposableFilter Function($$DataValuesTableFilterComposer f) f) {
+    final $$DataValuesTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $state.db.dataValues,
+        getReferencedColumn: (t) => t.templateDetailId,
+        builder: (joinBuilder, parentComposers) =>
+            $$DataValuesTableFilterComposer(ComposerState($state.db,
+                $state.db.dataValues, joinBuilder, parentComposers)));
+    return f(composer);
+  }
 }
 
 class $$TemplateDetailsTableOrderingComposer
@@ -1550,6 +2000,178 @@ class $$TemplateDetailsTableOrderingComposer
   }
 }
 
+typedef $$DataValuesTableCreateCompanionBuilder = DataValuesCompanion Function({
+  Value<String> id,
+  Value<DateTime> updatedAt,
+  Value<bool> isDeleted,
+  required String value,
+  required String templateId,
+  required String templateDetailId,
+  Value<int> rowid,
+});
+typedef $$DataValuesTableUpdateCompanionBuilder = DataValuesCompanion Function({
+  Value<String> id,
+  Value<DateTime> updatedAt,
+  Value<bool> isDeleted,
+  Value<String> value,
+  Value<String> templateId,
+  Value<String> templateDetailId,
+  Value<int> rowid,
+});
+
+class $$DataValuesTableTableManager extends RootTableManager<
+    _$VaultDatabase,
+    $DataValuesTable,
+    DataValue,
+    $$DataValuesTableFilterComposer,
+    $$DataValuesTableOrderingComposer,
+    $$DataValuesTableCreateCompanionBuilder,
+    $$DataValuesTableUpdateCompanionBuilder> {
+  $$DataValuesTableTableManager(_$VaultDatabase db, $DataValuesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$DataValuesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$DataValuesTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<String> value = const Value.absent(),
+            Value<String> templateId = const Value.absent(),
+            Value<String> templateDetailId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DataValuesCompanion(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            value: value,
+            templateId: templateId,
+            templateDetailId: templateDetailId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required String value,
+            required String templateId,
+            required String templateDetailId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DataValuesCompanion.insert(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            value: value,
+            templateId: templateId,
+            templateDetailId: templateDetailId,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$DataValuesTableFilterComposer
+    extends FilterComposer<_$VaultDatabase, $DataValuesTable> {
+  $$DataValuesTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get value => $state.composableBuilder(
+      column: $state.table.value,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  $$TemplatesTableFilterComposer get templateId {
+    final $$TemplatesTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.templateId,
+        referencedTable: $state.db.templates,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$TemplatesTableFilterComposer(ComposerState(
+                $state.db, $state.db.templates, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$TemplateDetailsTableFilterComposer get templateDetailId {
+    final $$TemplateDetailsTableFilterComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.templateDetailId,
+            referencedTable: $state.db.templateDetails,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$TemplateDetailsTableFilterComposer(ComposerState($state.db,
+                    $state.db.templateDetails, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+class $$DataValuesTableOrderingComposer
+    extends OrderingComposer<_$VaultDatabase, $DataValuesTable> {
+  $$DataValuesTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get value => $state.composableBuilder(
+      column: $state.table.value,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  $$TemplatesTableOrderingComposer get templateId {
+    final $$TemplatesTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.templateId,
+        referencedTable: $state.db.templates,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$TemplatesTableOrderingComposer(ComposerState(
+                $state.db, $state.db.templates, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$TemplateDetailsTableOrderingComposer get templateDetailId {
+    final $$TemplateDetailsTableOrderingComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.templateDetailId,
+            referencedTable: $state.db.templateDetails,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$TemplateDetailsTableOrderingComposer(ComposerState($state.db,
+                    $state.db.templateDetails, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
 class $VaultDatabaseManager {
   final _$VaultDatabase _db;
   $VaultDatabaseManager(this._db);
@@ -1559,4 +2181,6 @@ class $VaultDatabaseManager {
       $$TemplatesTableTableManager(_db, _db.templates);
   $$TemplateDetailsTableTableManager get templateDetails =>
       $$TemplateDetailsTableTableManager(_db, _db.templateDetails);
+  $$DataValuesTableTableManager get dataValues =>
+      $$DataValuesTableTableManager(_db, _db.dataValues);
 }

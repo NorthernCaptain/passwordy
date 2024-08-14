@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/screens/vault_list_screen.dart';
-import 'package:passwordy/service/log.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/add_options_state.dart';
 import 'package:passwordy/widgets/nav_item.dart';

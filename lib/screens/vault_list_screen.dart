@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:passwordy/service/database.dart';
-import 'package:passwordy/service/db_vault.dart';
+import 'package:passwordy/service/db/database.dart';
+import 'package:passwordy/service/db/db_vault.dart';
 import 'package:passwordy/service/log.dart';
 import 'package:passwordy/widgets/add_options_state.dart';
 import 'package:passwordy/widgets/empty_state.dart';

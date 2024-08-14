@@ -1,9 +1,13 @@
 
 import 'package:passwordy/service/auth_service.dart';
-import 'package:passwordy/service/database.dart';
+import 'package:passwordy/service/db/database.dart';
+import 'package:passwordy/service/db/datavalues_dao.dart';
+import 'package:passwordy/service/db/template_dao.dart';
 import 'package:passwordy/service/log.dart';
 
 abstract class Vault {
+  VaultDatabase? _db;
+
   static const String masterDB = 'master.edb';
   static Vault vault = DBVault();
   static Future<bool> exists(String name) async {
@@ -13,11 +17,12 @@ abstract class Vault {
 
   Future<bool> openDB({String name = Vault.masterDB});
   Future<List<Template>> getActiveTemplates();
+  VaultDatabase? get db => (_db as DBVault)._db;
+  DataValuesDao? get dataValuesDao => _db?.dataValuesDao;
+  TemplateDao? get templateDao => _db?.templateDao;
 }
 
-class DBVault implements Vault {
-  VaultDatabase? _db;
-
+class DBVault extends Vault {
   @override
   Future<bool> openDB({String name = Vault.masterDB}) async {
     try {
@@ -38,7 +43,7 @@ class DBVault implements Vault {
 
   @override
   Future<List<Template>> getActiveTemplates() async {
-    final templates = await _db?.getActiveTemplates() ?? [];
+    final templates = await _db?.templateDao.getActiveTemplates() ?? [];
     return templates;
   }
 }

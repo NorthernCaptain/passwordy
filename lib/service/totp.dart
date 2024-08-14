@@ -24,6 +24,9 @@ class OTPEntry {
         issuer = siteName.split(':')[0]
   ;
 
+  // Create an OTPEntry from a URI
+  // Example URI: otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example
+  // Format description: https://github.com/google/google-authenticator/wiki/Key-Uri-Format
   OTPEntry.fromUri(Uri uri)
       :siteName = '',
         secret = '',
