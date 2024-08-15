@@ -7,8 +7,10 @@ class TextEdit extends EditDetailRow<TextEditState> {
   final int minLines;
   final int maxLines;
   final bool useObscureText;
+  @override
   final FocusNode focusNode = FocusNode();
   final Function()? nextFocusNode;
+
 
   TextEdit({required super.data,
     this.textCapitalization = TextCapitalization.sentences,
@@ -17,7 +19,7 @@ class TextEdit extends EditDetailRow<TextEditState> {
     this.maxLines = 1,
     this.useObscureText = false,
     this.nextFocusNode,
-  }): super(key: GlobalKey());
+  }): super(key: GlobalKey<TextEditState>());
 
   @override
   TextEditState createState() => TextEditState();

@@ -17,7 +17,7 @@ abstract class Vault {
 
   Future<bool> openDB({String name = Vault.masterDB});
   Future<List<Template>> getActiveTemplates();
-  VaultDatabase? get db => (_db as DBVault)._db;
+  VaultDatabase? get db => _db;
   DataValuesDao? get dataValuesDao => _db?.dataValuesDao;
   TemplateDao? get templateDao => _db?.templateDao;
 }

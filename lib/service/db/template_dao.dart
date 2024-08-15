@@ -43,6 +43,10 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
         ..orderBy([(td) => OrderingTerm(expression: td.sort)])).get();
   }
 
+  Future<void> updateTemplateDetail(TemplateDetail detail) async {
+    await update(templateDetails).replace(detail);
+  }
+
   Future<(Map<String, String> old2new, Template template)>
   cloneTemplate(Template template, { bool isVisible = false, bool isData = false }) async {
     final Map<String, String> old2new = {};

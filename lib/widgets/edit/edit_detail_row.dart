@@ -25,6 +25,7 @@ abstract class ValueGetterState<T extends StatefulWidget> extends State<T> imple
 }
 
 abstract class BaseEditDetailRow<T extends ValueGetterState> extends StatefulWidget implements ValueGetterData {
+  FocusNode? get focusNode;
   const BaseEditDetailRow({required super.key});
   static BaseEditDetailRow create({required DataWithTemplate data, Function()? nextFocus}) {
     switch (data.templateDetail.fieldType) {
@@ -63,6 +64,8 @@ abstract class BaseEditDetailRow<T extends ValueGetterState> extends StatefulWid
 }
 
 abstract class EditDetailRow<T extends ValueGetterState> extends BaseEditDetailRow<T> {
+  @override
+  FocusNode? get focusNode => null;
   @override
   final DataWithTemplate data;
   @override

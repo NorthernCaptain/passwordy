@@ -1,5 +1,7 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:passwordy/service/db/database.dart';
+import 'package:passwordy/service/log.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/circle_icon.dart';
 import 'package:passwordy/service/db/db_vault.dart';
@@ -19,6 +21,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
   late TitleRow _titleRow;
   late List<BaseEditDetailRow> _detailRows;
   bool _isLoading = true;
+  bool _resorted = false;
 
   @override
   void initState() {
@@ -106,6 +109,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           for (int i = 0; i < _detailRows.length; i++) {
             _detailRows[i].updateSort(i + 1);
           }
+          _resorted = true;
         });
       },
     );
@@ -118,25 +122,29 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
       return;
     }
 
+    lg?.i('Updating card ${widget.template.id}');
     try {
       await db.transaction(() async {
         // Update existing template
-        if(_titleRow.isValueChanged) {
+        if (_titleRow.isValueChanged) {
+          lg?.i('Updating template header ${widget.template.id}');
           Template updatedTemplate;
           updatedTemplate = widget.template.copyWith(
             title: _titleRow.title,
-            category: _titleRow.category,
+            category: drift.Value(_titleRow.category),
           );
           await db.update(db.templates).replace(updatedTemplate);
         }
 
         // Update or create DataValues for input fields
         for (var detailRow in _detailRows) {
-          if(!detailRow.isValueChanged) continue;
+          if (!detailRow.isValueChanged) continue;
 
+          lg?.i('Updating data value ${detailRow.data.dataValue?.id}');
           final dataVal = detailRow.data.dataValue;
-          if(dataVal != null) {
-            await db.dataValuesDao.updateDataValue(dataVal.copyWith(value: detailRow.valueToStore));
+          if (dataVal != null) {
+            await db.dataValuesDao.updateDataValue(
+                dataVal.copyWith(value: detailRow.valueToStore));
           } else {
             await db.dataValuesDao.insertDataValue(
               DataValuesCompanion.insert(
@@ -145,6 +153,16 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
                 templateDetailId: detailRow.data.templateDetail.id,
               ),
             );
+          }
+        }
+
+        // Update template details sort values
+        if (_resorted) {
+          lg?.i('Updating template details sort values ${widget.template.id}');
+          for (var i = 0; i < _detailRows.length; i++) {
+            final detailRow = _detailRows[i];
+            await db.templateDao.updateTemplateDetail(
+                detailRow.data.templateDetail.copyWith(sort: i + 1));
           }
         }
       });
@@ -167,6 +185,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
       return;
     }
 
+    lg?.i('Creating card');
     try {
       await db.transaction(() async {
         Template updatedTemplate;
@@ -177,15 +196,16 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           isData: true,
           isVisible: true,
         );
-        updatedTemplate = updatedTemplate.copyWith(
+        updatedTemplate = widget.template.copyWith(
           title: _titleRow.title,
-          category: _titleRow.category,
+          category: drift.Value(_titleRow.category),
         );
         await db.templateDao.updateTemplate(updatedTemplate);
 
         // Update or create DataValues for input fields
         for (var detailRow in _detailRows) {
-          if(!detailRow.isValueChanged) continue;
+          if (!detailRow.isValueChanged) continue;
+          lg?.i('Inserting data value ${detailRow.valueToStore}');
           await db.dataValuesDao.insertDataValue(
             DataValuesCompanion.insert(
               value: detailRow.valueToStore,
@@ -194,30 +214,67 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
             ),
           );
         }
+
+        // Update template details sort values
+        if (_resorted) {
+          lg?.i('Updating template details sort values ${updatedTemplate.id}');
+          for (var i = 0; i < _detailRows.length; i++) {
+            final detailRow = _detailRows[i];
+            await db.templateDao.updateTemplateDetail(
+                detailRow.data.templateDetail.copyWith(sort: i + 1,
+                    id: old2new[detailRow.data.templateDetail.id]!));
+          }
+        }
       });
 
-      if(mounted) {
+      if (mounted) {
         snackInfo(context, 'Secret saved successfully');
         Navigator.pop(context);
       }
     } catch (e) {
-      if(mounted) snackError(context, 'Error saving secret: $e');
+      if (mounted) snackError(context, 'Error saving secret: $e');
     }
   }
 
   Future<void> save(BuildContext context) async {
+    try {
+      if (_titleRow.title.isEmpty) {
+        snackError(context, 'Title cannot be empty');
+        _titleRow.titleFocus.requestFocus();
+        return;
+      }
+      for (var row in _detailRows) {
+        try {
+          row.validate();
+        } catch (e) {
+          row.focusNode?.requestFocus();
+          rethrow;
+        }
+      }
+    } catch (e) {
+      if(e is FormatException) {
+        snackError(context, e.message);
+      }
+      return;
+    }
+    if (widget.template.isData) {
+      await updateCard();
+    } else {
+      await createCard();
+    }
   }
 }
 
 class TitleRow extends StatefulWidget {
   final Template template;
   final Function()? nextFocus;
-  get title => (key! as GlobalKey<TitleRowState>).currentState!.title;
-  get category => (key! as GlobalKey<TitleRowState>).currentState!.category;
+  get title => (key! as GlobalKey<TitleRowState>).currentState!.title.toString().trim();
+  get titleFocus => (key! as GlobalKey<TitleRowState>).currentState!.titleFocus;
+  get category => (key! as GlobalKey<TitleRowState>).currentState!.category.toString().trim();
 
   bool get isValueChanged => title != template.title || category != (template.category ?? "");
 
-  TitleRow({Key? key, required this.template, this.nextFocus}) : super(key: GlobalKey<TitleRowState>());
+  TitleRow({required this.template, this.nextFocus}) : super(key: GlobalKey<TitleRowState>());
 
   @override
   TitleRowState createState() => TitleRowState();
