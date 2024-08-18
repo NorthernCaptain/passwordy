@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:passwordy/screens/qr_code_reader.dart';
 import 'package:passwordy/service/totp.dart';
 import 'package:passwordy/widgets/edit/edit_detail_row.dart';
-import 'package:passwordy/widgets/edit/text_edit.dart';
 
 class OTPEdit extends EditDetailRow<OTPEditState> {
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/screens/login_screen.dart';
+import 'package:passwordy/service/preferences.dart';
 import 'master_password.dart';
 import '../service/auth_service.dart';
 
@@ -15,7 +16,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    Preferences.instance.init().then((_) {
+      _checkAuth();
+    });
   }
 
   void _checkAuth() async {

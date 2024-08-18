@@ -10,10 +10,10 @@ class SelectIconScreen extends StatefulWidget {
   final String? initialColor;
 
   const SelectIconScreen({
-    Key? key,
+    super.key,
     this.initialIconName,
     this.initialColor
-  }) : super(key: key);
+  });
 
   @override
   _SelectIconScreenState createState() => _SelectIconScreenState();

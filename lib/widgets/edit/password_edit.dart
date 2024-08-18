@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passwordy/screens/create_password.dart';
 import 'package:passwordy/widgets/edit/text_edit.dart';
 
 class PasswordEdit extends TextEdit {
@@ -15,9 +16,19 @@ class PasswordEditState extends TextEditState {
       IconButton(
         icon: const Icon(Icons.password),
         onPressed: () {
-          setState(() {
-          });
-        },
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CreatePasswordScreen(useSaveButton: true,),
+            ),
+          ).then((value) {
+            if (value != null && value["password"] != null) {
+              setState(() {
+                controller.text = value["password"];
+              });
+            }
+          },
+          );
+        }
       ),
     ];
   }

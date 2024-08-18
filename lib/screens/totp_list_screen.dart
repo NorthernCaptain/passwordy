@@ -5,7 +5,6 @@ import 'package:passwordy/service/db/datavalues_dao.dart';
 import 'package:passwordy/service/db/db_vault.dart';
 import 'dart:async';
 import 'package:passwordy/service/totp.dart';
-import 'package:passwordy/screens/qr_code_reader.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/add_options_state.dart';
 import 'package:passwordy/widgets/empty_state.dart';
