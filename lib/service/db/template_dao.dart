@@ -36,6 +36,24 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
         ..orderBy([(t) => OrderingTerm(expression: t.sort)])).get();
   }
 
+  Future<List<Template>> getActiveTokenTemplates() async {
+    final query = select(templates).join([
+      innerJoin(templateDetails, templateDetails.templateId.equalsExp(templates.id)),
+    ]);
+
+    query.where(templates.isVisible.equals(true)
+    & templates.isDeleted.equals(false)
+    & templates.isData.equals(false));
+
+    query.where(templateDetails.fieldType.equals(FieldType.token.name));
+
+    query.orderBy([OrderingTerm.asc(templates.title)]);
+
+    query.groupBy([templates.id]);
+
+    return query.map((row) => row.readTable(templates)).get();
+  }
+
   Future<List<TemplateDetail>> getTemplateDetails(String templateId) async {
     return
       (select(templateDetails)
@@ -59,6 +77,10 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
       await into(templateDetails).insert(detail.copyWith(id: newId, templateId: newTemplate.id));
     }
     return (old2new, newTemplate);
+  }
+
+  Future<void> deleteTemplate(Template template) async {
+    await update(templates).replace(template.copyWith(isDeleted: true));
   }
 
   Future<void> insertDefaults() async {
@@ -87,7 +109,7 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
       , [
       TemplateDetailsCompanion.insert(title: "Bank", fieldType: FieldType.capText, sort: 1, templateId: ''),
       TemplateDetailsCompanion.insert(title: "Card number", fieldType: FieldType.number, sort: 2, templateId: ''),
-      TemplateDetailsCompanion.insert(title: "Pin-code", fieldType: FieldType.pinCode, sort: 3, templateId: ''),
+      TemplateDetailsCompanion.insert(title: "Secret code", fieldType: FieldType.pinCode, sort: 3, templateId: ''),
       TemplateDetailsCompanion.insert(title: "Phone", fieldType: FieldType.phone, sort: 4, templateId: ''),
       TemplateDetailsCompanion.insert(title: "Notes", fieldType: FieldType.note, sort: 5, templateId: ''),
     ],

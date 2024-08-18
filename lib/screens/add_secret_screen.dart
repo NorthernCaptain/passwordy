@@ -11,7 +11,7 @@ import 'package:passwordy/widgets/edit/text_edit.dart';
 class AddSecretScreen extends StatefulWidget {
   final Template template;
 
-  const AddSecretScreen({Key? key, required this.template}) : super(key: key);
+  const AddSecretScreen({super.key, required this.template});
 
   @override
   _AddSecretScreenState createState() => _AddSecretScreenState();
@@ -196,7 +196,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           isData: true,
           isVisible: true,
         );
-        updatedTemplate = widget.template.copyWith(
+        updatedTemplate = updatedTemplate.copyWith(
           title: _titleRow.title,
           category: drift.Value(_titleRow.category),
         );
@@ -222,6 +222,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
             final detailRow = _detailRows[i];
             await db.templateDao.updateTemplateDetail(
                 detailRow.data.templateDetail.copyWith(sort: i + 1,
+                    templateId: updatedTemplate.id,
                     id: old2new[detailRow.data.templateDetail.id]!));
           }
         }
@@ -327,6 +328,7 @@ class TitleRowState extends State<TitleRow> {
               TextField(
                 controller: titleController,
                 focusNode: titleFocus,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
                   labelText: 'Title',
                   border: OutlineInputBorder(),
@@ -339,6 +341,7 @@ class TitleRowState extends State<TitleRow> {
               TextField(
                 controller: categoryController,
                 focusNode: categoryFocus,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
                   labelText: 'Category',
                   border: OutlineInputBorder(),

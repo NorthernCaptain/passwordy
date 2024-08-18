@@ -21,8 +21,10 @@ class OTPEntry {
         digits = 6,
         algorithm = 'SHA1',
         hash = sha1,
-        issuer = siteName.split(':')[0]
-  ;
+        issuer = siteName.split(':')[0] {
+    //try to decode the secret to check if it is valid
+    base32.decode(secret.toUpperCase().replaceAll(' ', ''));
+  }
 
   // Create an OTPEntry from a URI
   // Example URI: otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example
@@ -90,7 +92,7 @@ class OTPEntry {
     ((digest.bytes[offset + 2] & 0xff) << 8) |
     (digest.bytes[offset + 3] & 0xff);
 
-    int otp = binary % pow(10, digits).toInt();
+    int otp = (binary % pow(10, digits)).toInt();
     return otp.toString().padLeft(digits, '0');
   }
 

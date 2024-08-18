@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/screens/vault_list_screen.dart';
+import 'package:passwordy/service/db/db_vault.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/add_options_state.dart';
 import 'package:passwordy/widgets/nav_item.dart';
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     VaultListScreen(),
-    AuthenticatorScreen(),
+    AuthenticatorScreen(vault: Vault.vault,),
     const NotificationsPage(),
     const ProfilePage(),
   ];

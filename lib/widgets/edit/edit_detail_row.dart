@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:passwordy/service/db/datavalues_dao.dart';
 import 'package:passwordy/service/enums.dart';
 import 'package:passwordy/widgets/edit/email_edit.dart';
+import 'package:passwordy/widgets/edit/otp_edit.dart';
 import 'package:passwordy/widgets/edit/password_edit.dart';
 import 'package:passwordy/widgets/edit/phone_edit.dart';
 import 'package:passwordy/widgets/edit/text_edit.dart';
@@ -57,6 +58,8 @@ abstract class BaseEditDetailRow<T extends ValueGetterState> extends StatefulWid
           keyboardType: TextInputType.number,
           nextFocusNode: nextFocus,
           useObscureText: true,);
+      case FieldType.token:
+        return OTPEdit(data: data, nextFocusNode: nextFocus,);
       default:
         return TextEdit(data: data, nextFocusNode: nextFocus,);
     }

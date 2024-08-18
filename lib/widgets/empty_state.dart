@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 class EmptyState extends StatelessWidget {
+  const EmptyState({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -28,7 +30,7 @@ class EmptyState extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 CustomPaint(
-                  size: Size(380, 100),
+                  size: const Size(380, 100),
                   painter: ArcArrowPainter(),
                 ),
               ],
@@ -63,7 +65,7 @@ class ArcArrowPainter extends CustomPainter {
     canvas.drawPath(path, paint);
 
     // Draw arrowhead
-    final arrowSize = 10.0;
+    const arrowSize = 10.0;
     final arrowPath = Path();
     arrowPath.moveTo(size.width / 1.67 - arrowSize, size.height * 1.05);
     arrowPath.lineTo(size.width / 1.67 + arrowSize / 1.65, size.height - arrowSize / 0.6);

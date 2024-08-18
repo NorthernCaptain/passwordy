@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:passwordy/screens/add_secret_screen.dart';
 import 'package:passwordy/service/db/db_vault.dart';
 import 'package:passwordy/service/db/database.dart';
 import 'package:passwordy/widgets/circle_icon.dart';
@@ -7,9 +6,10 @@ import 'package:passwordy/widgets/circle_icon.dart';
 class NewItemChooser extends StatefulWidget {
   final Function(Template) onItemSelected;
   final Vault vault;
+  final Future<List<Template>> Function()? onLoad;
 
   const NewItemChooser(
-      {super.key, required this.onItemSelected, required this.vault});
+      {super.key, required this.onItemSelected, required this.vault, this.onLoad});
 
   @override
   _NewItemChooserState createState() => _NewItemChooserState();
@@ -22,7 +22,9 @@ class _NewItemChooserState extends State<NewItemChooser> {
   initState() {
     super.initState();
     setState(() {
-      templates = widget.vault.getActiveTemplates();
+      templates = widget.onLoad != null
+          ? widget.onLoad!.call()
+          : widget.vault.getActiveTemplates();
     });
   }
 
@@ -80,7 +82,6 @@ class _NewItemChooserState extends State<NewItemChooser> {
       onTap: () {
         Navigator.pop(context);
         widget.onItemSelected(template);
-        Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: template)));
       },
     );
   }

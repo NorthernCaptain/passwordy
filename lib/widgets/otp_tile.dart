@@ -3,11 +3,14 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:passwordy/service/totp.dart';
 import 'package:passwordy/service/utils.dart';
+import 'package:passwordy/widgets/circle_icon.dart';
 
 class OTPTile extends StatefulWidget {
   final OTPEntry entry;
+  final String iconName;
+  final String iconColor;
 
-  const OTPTile({super.key, required this.entry});
+  const OTPTile({super.key, required this.entry, this.iconName = '', this.iconColor = ''});
 
   @override
   _OTPTileState createState() => _OTPTileState();
@@ -49,9 +52,9 @@ class _OTPTileState extends State<OTPTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        child: Text(widget.entry.siteName[0]),
-      ),
+      leading: widget.iconName.isNotEmpty
+          ? CircleIcon(iconName: widget.iconName, backgroundColor: widget.iconColor)
+          : null,
       title: Text(widget.entry.siteName),
       subtitle: Text(
         formatCode(_currentCode),
@@ -78,9 +81,9 @@ class _OTPTileState extends State<OTPTile> {
         alignment: Alignment.center,
         children: [
           CircularProgressIndicator(
-            value: remainingSeconds / entry.period,
-            backgroundColor: Colors.grey[200],
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+            value: 1 - remainingSeconds / entry.period,
+            backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.secondary),
           ),
           Text(
             '$remainingSeconds',
