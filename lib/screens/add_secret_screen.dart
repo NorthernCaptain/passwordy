@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:passwordy/screens/select_icon.dart';
 import 'package:passwordy/service/db/database.dart';
 import 'package:passwordy/service/log.dart';
 import 'package:passwordy/service/utils.dart';
@@ -132,6 +133,8 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           updatedTemplate = widget.template.copyWith(
             title: _titleRow.title,
             category: drift.Value(_titleRow.category),
+            icon: _titleRow.iconName,
+            color: _titleRow.iconColor,
           );
           await db.update(db.templates).replace(updatedTemplate);
         }
@@ -199,6 +202,8 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
         updatedTemplate = updatedTemplate.copyWith(
           title: _titleRow.title,
           category: drift.Value(_titleRow.category),
+          icon: _titleRow.iconName,
+          color: _titleRow.iconColor,
         );
         await db.templateDao.updateTemplate(updatedTemplate);
 
@@ -272,8 +277,13 @@ class TitleRow extends StatefulWidget {
   get title => (key! as GlobalKey<TitleRowState>).currentState!.title.toString().trim();
   get titleFocus => (key! as GlobalKey<TitleRowState>).currentState!.titleFocus;
   get category => (key! as GlobalKey<TitleRowState>).currentState!.category.toString().trim();
+  get iconName => (key! as GlobalKey<TitleRowState>).currentState!.iconName;
+  get iconColor => (key! as GlobalKey<TitleRowState>).currentState!.iconColor;
 
-  bool get isValueChanged => title != template.title || category != (template.category ?? "");
+  bool get isValueChanged => title != template.title
+      || category != (template.category ?? "")
+      || iconName != template.icon
+      || iconColor != template.color;
 
   TitleRow({required this.template, this.nextFocus}) : super(key: GlobalKey<TitleRowState>());
 
@@ -286,6 +296,8 @@ class TitleRowState extends State<TitleRow> {
   late TextEditingController categoryController;
   final titleFocus = FocusNode();
   final categoryFocus = FocusNode();
+  String iconName = '';
+  String iconColor = '';
 
   get title => titleController.text.trim();
   get category => categoryController.text.trim();
@@ -295,6 +307,8 @@ class TitleRowState extends State<TitleRow> {
     super.initState();
     titleController = TextEditingController(text: widget.template.isData ? widget.template.title : "");
     categoryController = TextEditingController(text: widget.template.category);
+    iconName = widget.template.icon;
+    iconColor = widget.template.color;
     if(!widget.template.isData) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         FocusScope.of(context).requestFocus(titleFocus);
@@ -316,9 +330,28 @@ class TitleRowState extends State<TitleRow> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleIcon(
-          iconName: widget.template.icon,
-          backgroundColor: widget.template.color,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => SelectIconScreen(
+              initialIconName: iconName,
+              initialColor: iconColor,
+            ))).then((value) {
+              if (value != null) {
+                setState(() {
+                  iconName = value['iconName'];
+                  iconColor = value['color'];
+                });
+              }
+            });
+          },
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child:  CircleIcon(
+              iconName: iconName,
+              backgroundColor: iconColor,
+            ),
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(

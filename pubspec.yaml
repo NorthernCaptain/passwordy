@@ -48,6 +48,7 @@ dependencies:
   local_auth_android: any
   qr_code_scanner: ^1.0.1
   email_validator: ^3.0.0
+  flutter_colorpicker: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
