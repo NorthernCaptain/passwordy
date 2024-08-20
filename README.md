@@ -63,5 +63,5 @@ We welcome contributions to Passwordy! Please feel free to submit issues, featur
 
 ## License
 
-Passwordy is released under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE) file for details.
+Passwordy is released under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE.txt) file for details.
 
