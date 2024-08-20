@@ -3,6 +3,7 @@ import 'package:passwordy/screens/home_screen.dart';
 import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/service/db/db_vault.dart';
 import 'package:passwordy/service/log.dart';
+import 'package:passwordy/service/sync/sync_manager.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/password_field.dart';
 
@@ -24,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _checkBiometrics();
+    SyncManager.instance.ensureSignedIn();
   }
 
   Future<void> _checkBiometrics() async {

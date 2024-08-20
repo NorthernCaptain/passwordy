@@ -1,4 +1,4 @@
-package nothern.captain.passwordy
+package northern.captain.passwordy
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
