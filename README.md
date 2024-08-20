@@ -2,6 +2,10 @@
 
 Passwordy is a free, open-source, multi-platform offline password manager designed to keep your sensitive information secure and easily accessible across all your devices.
 
+## Project Status
+
+**Note:** Passwordy is currently under active development, and the first version is yet to be released. While we're working hard to bring you a stable and feature-complete version, please be aware that the software may be incomplete or contain bugs. We welcome early testers and contributors to help shape the future of Passwordy!
+
 ## Features
 
 - **Offline-first**: Your data is stored locally, ensuring maximum privacy and security.
@@ -59,9 +63,9 @@ Passwordy is written in Flutter, which allows it to run on multiple platforms fr
 
 ## Contributing
 
-We welcome contributions to Passwordy! Please feel free to submit issues, feature requests, or pull requests on our GitHub repository.
+We welcome contributions to Passwordy! Please feel free to submit issues, feature requests, or pull requests on our GitHub repository. As the project is in its early stages, your input is especially valuable in shaping the direction and features of Passwordy.
 
 ## License
 
-Passwordy is released under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE.txt) file for details.
+Passwordy is released under the GNU General Public License v3.0 (GPLv3). See the [LICENSE.txt](LICENSE.txt) file for details.
 
