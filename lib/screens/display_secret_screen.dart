@@ -11,8 +11,9 @@ import 'package:passwordy/widgets/display/display_otp.dart';
 
 class DisplaySecretScreen extends StatefulWidget {
   final Template template;
+  final Vault vault;
 
-  const DisplaySecretScreen({super.key, required this.template});
+  const DisplaySecretScreen({super.key, required this.template, required this.vault});
 
   @override
   _DisplaySecretScreenState createState() => _DisplaySecretScreenState();
@@ -32,8 +33,7 @@ class _DisplaySecretScreenState extends State<DisplaySecretScreen> {
   }
 
   Future<void> _loadData() async {
-    final dataWithTemplates = await Vault.vault.dataValuesDao
-        ?.getDataWithTemplate(widget.template.id, onlyData: true) ?? [];
+    final dataWithTemplates = await Vault.vault.getDataWithTemplate(widget.template.id, onlyData: true);
     setState(() {
       _detailRows = dataWithTemplates.map((dwt) => BaseDisplayDetailRow(data: dwt)).toList();
       _isLoading = false;
@@ -83,7 +83,7 @@ class _DisplaySecretScreenState extends State<DisplaySecretScreen> {
   Future<void> edit(BuildContext context) async {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => AddSecretScreen(template: widget.template),
+        builder: (context) => AddSecretScreen(template: widget.template, vault: widget.vault,),
       ),
     );
   }

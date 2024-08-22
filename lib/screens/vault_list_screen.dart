@@ -12,7 +12,8 @@ import 'package:passwordy/widgets/new_item_chooser.dart';
 import 'package:passwordy/widgets/search_widget.dart';
 
 class VaultListScreen extends AddOptionsWidget {
-  VaultListScreen({super.key});
+  final Vault vault;
+  VaultListScreen({super.key, required this.vault});
 
   @override
   _VaultListScreenState createState() => _VaultListScreenState();
@@ -26,7 +27,7 @@ class _VaultListScreenState
   @override
   void initState() {
     super.initState();
-    _dataStream = Vault.vault.dataValuesDao?.watchActiveDataTemplates(filter: _searchQuery) ?? Stream.value([]);
+    _dataStream = Vault.vault.watchActiveDataTemplates(filter: _searchQuery);
   }
 
   @override
@@ -102,7 +103,7 @@ class _VaultListScreenState
       },
       onDismissed: (direction) async {
         // Delete the item from the database
-        await Vault.vault.templateDao?.deleteTemplate(item);
+        await Vault.vault.deleteTemplate(item);
         snackInfo(context, '${item.title} deleted');
       },
       child: _buildEntry(context, item),
@@ -122,7 +123,7 @@ class _VaultListScreenState
       ),
       onTap: () {
         // Handle item tap
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => DisplaySecretScreen(template: entry)));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => DisplaySecretScreen(template: entry, vault: widget.vault,)));
       },
     );
   }
@@ -131,7 +132,7 @@ class _VaultListScreenState
     lg?.i('Searching for: $query');
     setState(() {
       _searchQuery = query;
-      _dataStream = Vault.vault.dataValuesDao?.watchActiveDataTemplates(filter: _searchQuery) ?? Stream.value([]);
+      _dataStream = Vault.vault.watchActiveDataTemplates(filter: _searchQuery);
     });
   }
 
@@ -147,7 +148,7 @@ class _VaultListScreenState
           vault: Vault.vault,
           onItemSelected: (Template item) {
             // Handle the selected item
-            Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: item)));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: item, vault: widget.vault,)));
           },
         );
       },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passwordy/screens/create_password.dart';
 import 'package:passwordy/screens/vault_list_screen.dart';
 import 'package:passwordy/service/db/db_vault.dart';
+import 'package:passwordy/service/sync/sync_manager.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:passwordy/widgets/add_options_state.dart';
 import 'package:passwordy/widgets/nav_item.dart';
@@ -18,9 +19,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    VaultListScreen(),
+    VaultListScreen(vault: Vault.vault,),
     AuthenticatorScreen(vault: Vault.vault,),
-    CreatePasswordScreen(),
+    CreatePasswordScreen(vault: Vault.vault,),
     const ProfilePage(),
   ];
 
@@ -140,8 +141,18 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Profile Page', style: TextStyle(fontSize: 24)),
+    return Center(
+      child: ElevatedButton(onPressed: () {
+        SyncManager.instance.guarded((driveService) async {
+          // Perform your Google Drive operations here
+          // For example:
+          final folderId = await driveService.createFolder("passwordy.backup/db");
+          snackInfo(context, 'Created folder with ID: $folderId');
+        }).catchError((e) {
+          // Handle sign-in failure
+          snackError(context, e.toString());
+        });
+      }, child: const Text('Sync with Google Drive')),
     );
   }
 }

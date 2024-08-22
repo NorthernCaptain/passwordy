@@ -26,7 +26,7 @@ class _AuthenticatorScreenState
   @override
   void initState() {
     super.initState();
-    _dataStream = widget.vault.dataValuesDao?.watchActiveTokenTemplates() ?? Stream.value([]);
+    _dataStream = widget.vault.watchActiveTokenTemplates();
   }
 
   @override
@@ -108,7 +108,7 @@ class _AuthenticatorScreenState
       onDismissed: (direction) {
         var msg = '${otpEntry.siteName} deleted';
         setState(() {
-          widget.vault.templateDao?.deleteTemplate(data.template);
+          widget.vault.deleteTemplate(data.template);
         });
         snackInfo(context, msg);
       },
@@ -130,9 +130,9 @@ class _AuthenticatorScreenState
           vault: widget.vault,
           onItemSelected: (Template item) {
             // Handle the selected item
-            Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: item)));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: item, vault: widget.vault,)));
           },
-          onLoad: widget.vault.templateDao?.getActiveTokenTemplates,
+          onLoad: widget.vault.getActiveTokenTemplates,
         );
       },
     );

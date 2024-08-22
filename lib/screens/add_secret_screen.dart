@@ -11,8 +11,9 @@ import 'package:passwordy/widgets/edit/text_edit.dart';
 
 class AddSecretScreen extends StatefulWidget {
   final Template template;
+  final Vault vault;
 
-  const AddSecretScreen({super.key, required this.template});
+  const AddSecretScreen({super.key, required this.template, required this.vault});
 
   @override
   _AddSecretScreenState createState() => _AddSecretScreenState();
@@ -38,8 +39,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
   }
 
   Future<void> _loadData() async {
-    final dataWithTemplates = await Vault.vault.dataValuesDao
-        ?.getDataWithTemplate(widget.template.id) ?? [];
+    final dataWithTemplates = await Vault.vault.getDataWithTemplate(widget.template.id);
     setState(() {
       int idx = 0;
       _detailRows = dataWithTemplates.map((dwt) {
@@ -117,15 +117,9 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
   }
 
   Future<void> updateCard() async {
-    final db = Vault.vault.db;
-    if (db == null) {
-      snackError(context, 'Database not available');
-      return;
-    }
-
     lg?.i('Updating card ${widget.template.id}');
     try {
-      await db.transaction(() async {
+      await widget.vault.transaction(() async {
         // Update existing template
         if (_titleRow.isValueChanged) {
           lg?.i('Updating template header ${widget.template.id}');
@@ -136,7 +130,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
             icon: _titleRow.iconName,
             color: _titleRow.iconColor,
           );
-          await db.update(db.templates).replace(updatedTemplate);
+          await widget.vault.updateTemplate(updatedTemplate);
         }
 
         // Update or create DataValues for input fields
@@ -146,10 +140,10 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           lg?.i('Updating data value ${detailRow.data.dataValue?.id}');
           final dataVal = detailRow.data.dataValue;
           if (dataVal != null) {
-            await db.dataValuesDao.updateDataValue(
+            await widget.vault.updateDataValue(
                 dataVal.copyWith(value: detailRow.valueToStore));
           } else {
-            await db.dataValuesDao.insertDataValue(
+            await widget.vault.insertDataValue(
               DataValuesCompanion.insert(
                 value: detailRow.valueToStore,
                 templateId: widget.template.id,
@@ -164,7 +158,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           lg?.i('Updating template details sort values ${widget.template.id}');
           for (var i = 0; i < _detailRows.length; i++) {
             final detailRow = _detailRows[i];
-            await db.templateDao.updateTemplateDetail(
+            await widget.vault.updateTemplateDetail(
                 detailRow.data.templateDetail.copyWith(sort: i + 1));
           }
         }
@@ -180,21 +174,13 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
   }
 
   Future<void> createCard() async {
-    final db = Vault.vault.db;
-    if (db == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Database not available')),
-      );
-      return;
-    }
-
     lg?.i('Creating card');
     try {
-      await db.transaction(() async {
+      await widget.vault.transaction(() async {
         Template updatedTemplate;
         Map<String, String> old2new;
         // Clone the template and set isData to true
-        (old2new, updatedTemplate) = await db.templateDao.cloneTemplate(
+        (old2new, updatedTemplate) = await widget.vault.cloneTemplate(
           widget.template,
           isData: true,
           isVisible: true,
@@ -205,13 +191,13 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           icon: _titleRow.iconName,
           color: _titleRow.iconColor,
         );
-        await db.templateDao.updateTemplate(updatedTemplate);
+        await widget.vault.updateTemplate(updatedTemplate);
 
         // Update or create DataValues for input fields
         for (var detailRow in _detailRows) {
           if (!detailRow.isValueChanged) continue;
           lg?.i('Inserting data value ${detailRow.valueToStore}');
-          await db.dataValuesDao.insertDataValue(
+          await widget.vault.insertDataValue(
             DataValuesCompanion.insert(
               value: detailRow.valueToStore,
               templateId: updatedTemplate.id,
@@ -225,7 +211,7 @@ class _AddSecretScreenState extends State<AddSecretScreen> {
           lg?.i('Updating template details sort values ${updatedTemplate.id}');
           for (var i = 0; i < _detailRows.length; i++) {
             final detailRow = _detailRows[i];
-            await db.templateDao.updateTemplateDetail(
+            await widget.vault.updateTemplateDetail(
                 detailRow.data.templateDetail.copyWith(sort: i + 1,
                     templateId: updatedTemplate.id,
                     id: old2new[detailRow.data.templateDetail.id]!));

@@ -11,7 +11,8 @@ import 'package:passwordy/widgets/new_item_chooser.dart';
 
 class CreatePasswordScreen extends AddOptionsWidget {
   final bool useSaveButton;
-  CreatePasswordScreen({super.key, this.useSaveButton = false});
+  final Vault vault;
+  CreatePasswordScreen({super.key, this.useSaveButton = false, required this.vault});
 
   @override
   _CreatePasswordScreenState createState() => _CreatePasswordScreenState();
@@ -266,7 +267,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen>
           vault: Vault.vault,
           onItemSelected: (Template item) {
             // Handle the selected item
-            Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: item)));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => AddSecretScreen(template: item, vault: widget.vault)));
           },
         );
       },

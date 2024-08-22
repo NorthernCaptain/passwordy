@@ -134,14 +134,3 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
     );
   }
 }
-
-// This extension adds the lazy loading method to the Template class
-extension TemplateWithDetails on Template {
-  Future<List<TemplateDetail>> get details async {
-    final db = Vault.vault.db;
-    if (db == null) {
-      return [];
-    }
-    return await (db.select(db.templateDetails)..where((t) => t.templateId.equals(id) & t.isDeleted.equals(false))).get();
-  }
-}

@@ -1,6 +1,10 @@
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:passwordy/service/log.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:async';
 
 const uuid = Uuid();
 
@@ -43,4 +47,52 @@ snackInfo(BuildContext context, String message) {
     content: Text(message),
     duration: const Duration(seconds: 3),
   ));
+}
+
+class BarrierWaiter {
+  Completer<void> _completer = Completer<void>();
+  int _nowRunning = 0;
+
+  void start() {
+    _nowRunning++;
+  }
+
+  bool isSafe() {
+    return _nowRunning == 0;
+  }
+
+  // Method for the producer to signal completion
+  void signalCompletion() {
+    _nowRunning = max(0, _nowRunning - 1);
+    if (_nowRunning == 0) _completer.complete();
+  }
+
+  // Method for consumers to await completion
+  Future<void> awaitCompletion() async {
+    if (_nowRunning == 0) return;
+    await _completer.future;
+  }
+
+  Future<T> safely<T>(Future<T> Function() action) async {
+    await awaitCompletion();
+    return action();
+  }
+
+  // Reset the synchronization state
+  void reset() {
+    if (_nowRunning == 0) {
+      _completer = Completer<void>();
+    } else {
+      lg?.e("Barrier reset called while still running: $_nowRunning");
+    }
+  }
+
+  Future<T> run<T>(Future<T> Function() action) async {
+    start();
+    try {
+      return await action();
+    } finally {
+      signalCompletion();
+    }
+  }
 }
