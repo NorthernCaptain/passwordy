@@ -1,10 +1,13 @@
 
 import 'dart:async';
+import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:passwordy/service/auth_service.dart';
 import 'package:passwordy/service/db/database.dart';
 import 'package:passwordy/service/db/datavalues_dao.dart';
 import 'package:passwordy/service/log.dart';
+import 'package:passwordy/service/sync/sync_manager.dart';
 import 'package:passwordy/service/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -17,6 +20,8 @@ abstract class Vault {
     return exists;
   }
 
+  void scheduleSync();
+
   Future<bool> openDB({String name = Vault.masterDB});
   bool get isConnected;
   Stream<bool> get connectionStream;
@@ -25,6 +30,7 @@ abstract class Vault {
 
   Future<void> closeDB();
 
+  // Transactions for CRUD operations. Every single DB change should go through transaction!
   Future<T> transaction<T>(Future<T> Function() action);
 
   Future<List<DataWithTemplate>> getDataWithTemplate(String templateId,
@@ -53,8 +59,10 @@ abstract class Vault {
 class DBVault extends Vault {
   VaultDatabase? _db;
 
-  final BarrierWaiter _dbMounted = BarrierWaiter();
-  final BarrierWaiter _dbBusy = BarrierWaiter();
+  //this is raised when the DB needs some maintenance like opening or closing, backup etc
+  final BarrierWaiter _dbMounted = BarrierWaiter("mounted");
+  //this is raised when we have an active running DB operation like fetch or CRUD
+  final BarrierWaiter _dbBusy = BarrierWaiter("busy");
 
   final _connectionController = BehaviorSubject<bool>.seeded(false);
 
@@ -68,8 +76,7 @@ class DBVault extends Vault {
   @override
   Future<bool> openDB({String name = Vault.masterDB}) async {
     try {
-      _setConnectionState(false);
-      await _db?.close();
+      closeDB();
 
       final password = await AuthService().getCurrentPassword();
       if(password == null) {
@@ -91,7 +98,11 @@ class DBVault extends Vault {
 
   @override
   Future<void> closeDB() async {
+    if(_db == null) {
+      return;
+    }
     await _db?.close();
+    _db = null;
     _setConnectionState(false);
   }
 
@@ -102,6 +113,73 @@ class DBVault extends Vault {
       _dbMounted.signalCompletion();
     } else {
       _dbMounted.start();
+    }
+  }
+
+  Timer? _syncTimer = null;
+
+  @override
+  void scheduleSync() {
+    _syncTimer?.cancel();
+    _syncTimer = Timer(const Duration(seconds: 5), () {
+      syncDB();
+    });
+  }
+
+  Future<bool> syncDB() async {
+    lg?.i('DB sync started');
+    final backup = await _dbBusy.safely(() async {
+      if(_db == null) {
+        lg?.e('DB not open, cannot sync');
+        return null;
+      }
+      return await copyAndReopenDB();
+    });
+    lg?.i("DB sync got backup: $backup");
+    if(backup == null) {
+      return false;
+    }
+    await SyncManager.instance.uploadBackup(backup, dbName: _db!.dbName, removeLocal: true);
+    lg?.i('DB sync finished');
+    return true;
+  }
+
+  Future<String?> copyAndReopenDB() async {
+    try {
+      if(_db == null) {
+        lg?.e('DB not open, cannot copy and reopen');
+        return null;
+      }
+
+      final name = _db!.dbName;
+
+      // Close the current database
+      await closeDB();
+
+      // Get the path to the current database file
+      final path = await databasePath(name);
+      final dbFile = File(path);
+
+      // Create a backup copy
+      final backupFile = File('${dbFile.path}.backup');
+      if(await backupFile.exists()) {
+        await backupFile.delete();
+      }
+      await dbFile.copy(backupFile.path);
+
+      // Reopen the database
+      final success = await openDB(name: name);
+
+      if (!success) {
+        // If reopening failed, restore from the backup
+        await backupFile.copy(dbFile.path);
+        await openDB(name: name);
+      }
+
+      return backupFile.path;
+    } catch (e) {
+      lg?.e('Error during copy and reopen', error: e);
+      return null;
     }
   }
 
@@ -121,16 +199,6 @@ class DBVault extends Vault {
           templateId, onlyData: onlyData) ?? [];
       return data;
     });
-  }
-
-  @override
-  Future<DataValue> insertDataValue(DataValuesCompanion dataValue) async {
-    return _db!.dataValuesDao.insertDataValue(dataValue);
-  }
-
-  @override
-  Future<void> updateDataValue(DataValue dataValue) async {
-    await _db!.dataValuesDao.updateDataValue(dataValue);
   }
 
   @override
@@ -157,8 +225,15 @@ class DBVault extends Vault {
   }
 
   @override
+  Future<List<Template>> getActiveTokenTemplates() async {
+    return safely(_db!.templateDao.getActiveTokenTemplates);
+  }
+
+  @override
   Future<T> transaction<T>(Future<T> Function() action) async {
-    return safely(() async => await _db!.transaction(action));
+    final ret = safely(() async => await _db!.transaction(action));
+    scheduleSync();
+    return ret;
   }
 
   @override
@@ -183,8 +258,13 @@ class DBVault extends Vault {
   }
 
   @override
-  Future<List<Template>> getActiveTokenTemplates() async {
-    return safely(_db!.templateDao.getActiveTokenTemplates);
+  Future<DataValue> insertDataValue(DataValuesCompanion dataValue) async {
+    return _db!.dataValuesDao.insertDataValue(dataValue);
+  }
+
+  @override
+  Future<void> updateDataValue(DataValue dataValue) async {
+    await _db!.dataValuesDao.updateDataValue(dataValue);
   }
 
   Future<T> safely<T>(Future<T> Function() action) async {

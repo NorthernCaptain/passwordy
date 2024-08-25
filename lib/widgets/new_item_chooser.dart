@@ -65,7 +65,13 @@ class _NewItemChooserState extends State<NewItemChooser> {
                     },
                   );
                 } else {
-                  return const CircularProgressIndicator();
+                  return Center(
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  );
                 }
               },
             ),

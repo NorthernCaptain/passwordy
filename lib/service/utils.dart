@@ -50,8 +50,11 @@ snackInfo(BuildContext context, String message) {
 }
 
 class BarrierWaiter {
+  final String name;
   Completer<void> _completer = Completer<void>();
   int _nowRunning = 0;
+
+  BarrierWaiter(this.name);
 
   void start() {
     _nowRunning++;
@@ -64,7 +67,12 @@ class BarrierWaiter {
   // Method for the producer to signal completion
   void signalCompletion() {
     _nowRunning = max(0, _nowRunning - 1);
-    if (_nowRunning == 0) _completer.complete();
+    if (_nowRunning == 0) {
+      lg?.i("Barrier completed: $name");
+      _completer.complete();
+      reset();
+      lg?.i("Barrier reset: $name");
+    }
   }
 
   // Method for consumers to await completion

@@ -103,7 +103,7 @@ class _VaultListScreenState
       },
       onDismissed: (direction) async {
         // Delete the item from the database
-        await Vault.vault.deleteTemplate(item);
+        widget.vault.transaction(() async => widget.vault.deleteTemplate(item));
         snackInfo(context, '${item.title} deleted');
       },
       child: _buildEntry(context, item),

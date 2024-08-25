@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 import 'package:passwordy/service/db/database.dart';
-import 'package:passwordy/service/db/db_vault.dart';
 import 'package:passwordy/service/enums.dart';
 import 'package:passwordy/service/utils.dart';
 
@@ -26,7 +25,7 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
   }
 
   Future<void> updateTemplate(Template template) async {
-    await update(templates).replace(template);
+    await update(templates).replace(template.copyWith(updatedAt: DateTime.now()));
   }
 
   Future<List<Template>> getActiveTemplates() async {
@@ -62,25 +61,25 @@ class TemplateDao extends DatabaseAccessor<VaultDatabase> with _$TemplateDaoMixi
   }
 
   Future<void> updateTemplateDetail(TemplateDetail detail) async {
-    await update(templateDetails).replace(detail);
+    await update(templateDetails).replace(detail.copyWith(updatedAt: DateTime.now()));
   }
 
   Future<(Map<String, String> old2new, Template template)>
   cloneTemplate(Template template, { bool isVisible = false, bool isData = false }) async {
     final Map<String, String> old2new = {};
-    final newTemplate = template.copyWith(id: generateId(), isVisible: isVisible, isData: isData);
+    final newTemplate = template.copyWith(id: generateId(), isVisible: isVisible, isData: isData, updatedAt: DateTime.now());
     await into(templates).insert(newTemplate);
     final details = await getTemplateDetails(template.id);
     for (final detail in details) {
       final newId = generateId();
       old2new[detail.id] = newId;
-      await into(templateDetails).insert(detail.copyWith(id: newId, templateId: newTemplate.id));
+      await into(templateDetails).insert(detail.copyWith(id: newId, templateId: newTemplate.id, updatedAt: DateTime.now()));
     }
     return (old2new, newTemplate);
   }
 
   Future<void> deleteTemplate(Template template) async {
-    await update(templates).replace(template.copyWith(isDeleted: true));
+    await update(templates).replace(template.copyWith(isDeleted: true, updatedAt: DateTime.now()));
   }
 
   Future<void> insertDefaults() async {

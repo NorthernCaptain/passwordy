@@ -197,6 +197,108 @@ class GoogleDriveServiceImpl implements DriveService {
       rethrow;
     }
   }
+
+  @override
+  Future<RenameResult> renameFile(String oldFileName, String folderPath, String newFileName, {bool overwriteExisting = false}) async {
+    if (_driveApi == null) throw Exception('Not signed in');
+
+    try {
+      // Find the folder
+      String? folderId = await _getFolderByPath(folderPath);
+      if (folderId == null) {
+        return RenameResult.folderNotFound;
+      }
+
+      // Find the file to rename
+      final fileToRenameList = await _driveApi!.files.list(
+          q: "'$folderId' in parents and name = '$oldFileName' and trashed = false",
+          $fields: "files(id, name)"
+      );
+
+      if (fileToRenameList.files == null || fileToRenameList.files!.isEmpty) {
+        return RenameResult.fileNotFound;
+      }
+
+      final fileToRename = fileToRenameList.files!.first;
+
+      // Check if a file with the new name already exists
+      final existingFileList = await _driveApi!.files.list(
+          q: "'$folderId' in parents and name = '$newFileName' and trashed = false",
+          $fields: "files(id, name)"
+      );
+
+      if (existingFileList.files != null && existingFileList.files!.isNotEmpty) {
+        if (!overwriteExisting) {
+          return RenameResult.nameConflict;
+        }
+        // If overwriteExisting is true, we'll proceed with the rename, effectively replacing the existing file
+      }
+
+      return await renameFileById(fileToRename.id!, newFileName, folderPath, overwriteExisting: overwriteExisting);
+    } catch (e) {
+      lg?.e('Error renaming file: $e', error: e);
+      return RenameResult.unknownError;
+    }
+  }
+
+  @override
+  Future<RenameResult> renameFileById(String fileId, String newFileName, String folder, {bool overwriteExisting = false}) async {
+    try {
+      // Update the file metadata
+      final updatedFile = drive.File()..name = newFileName;
+
+      String? oldFileId;
+      if(overwriteExisting) {
+        oldFileId = await fileExists(newFileName, folder);
+      }
+
+      final result = await _driveApi!.files.update(
+          updatedFile,
+          fileId,
+          $fields: "id, name"
+      );
+
+      if(oldFileId != null && result.name == newFileName) {
+        await _driveApi!.files.delete(oldFileId);
+      }
+
+      return result.name == newFileName ? RenameResult.success : RenameResult.unknownError;
+    } catch (e) {
+      lg?.e('Error renaming file: $e', error: e);
+      return RenameResult.unknownError;
+    }
+  }
+
+  @override
+  Future<String?> fileExists(String fileName, String folderPath) async {
+    if (_driveApi == null) throw Exception('Not signed in');
+
+    try {
+      // Find the folder
+      String? folderId = await _getFolderByPath(folderPath);
+      if (folderId == null) {
+        lg?.e('Folder not found: $folderPath');
+        return null;
+      }
+
+      // Search for the file in the folder
+      final fileList = await _driveApi!.files.list(
+          q: "'$folderId' in parents and name = '$fileName' and trashed = false",
+          $fields: "files(id, name)"
+      );
+
+      if (fileList.files != null && fileList.files!.isNotEmpty) {
+        // File exists, return its ID
+        return fileList.files!.first.id;
+      } else {
+        // File doesn't exist
+        return null;
+      }
+    } catch (e) {
+      lg?.e('Error checking if file exists: $e');
+      return null;
+    }
+  }
 }
 
 class GoogleAuthClient extends http.BaseClient {

@@ -108,7 +108,7 @@ class _AuthenticatorScreenState
       onDismissed: (direction) {
         var msg = '${otpEntry.siteName} deleted';
         setState(() {
-          widget.vault.deleteTemplate(data.template);
+          widget.vault.transaction(() async => widget.vault.deleteTemplate(data.template));
         });
         snackInfo(context, msg);
       },

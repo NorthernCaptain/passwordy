@@ -8,6 +8,14 @@ enum DriveServiceType {
   oneDrive // Not implemented
 }
 
+enum RenameResult {
+  success,
+  fileNotFound,
+  folderNotFound,
+  nameConflict,
+  unknownError
+}
+
 abstract class DriveService {
   Future<bool> signIn();
   Future<bool> silentSignIn();
@@ -16,6 +24,9 @@ abstract class DriveService {
   Future<bool> deleteFile(String fileId);
   Future<List<DriveFile>> listFiles(String folderName);
   Future<String> createFolder(String folderName);
+  Future<RenameResult> renameFile(String oldFileName, String folderPath, String newFileName, {bool overwriteExisting = false});
+  Future<RenameResult> renameFileById(String fileId, String newFileName, String folder, {bool overwriteExisting = false});
+  Future<String?> fileExists(String fileName, String folderPath);
 
   factory DriveService(DriveServiceType type) {
     switch (type) {

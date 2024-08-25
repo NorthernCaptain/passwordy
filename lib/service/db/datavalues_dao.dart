@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:passwordy/service/db/database.dart';
 import 'package:passwordy/service/enums.dart';
-import 'package:passwordy/service/log.dart';
 
 part 'datavalues_dao.g.dart';
 
@@ -27,11 +26,11 @@ class DataValuesDao extends DatabaseAccessor<VaultDatabase> with _$DataValuesDao
   DataValuesDao(super.db);
 
   Future<DataValue> insertDataValue(DataValuesCompanion dataValue) async {
-    return into(dataValues).insertReturning(dataValue);
+    return into(dataValues).insertReturning(dataValue.copyWith(updatedAt: Value(DateTime.now())));
   }
 
   Future<void> updateDataValue(DataValue dataValue) async {
-    await update(dataValues).replace(dataValue);
+    await update(dataValues).replace(dataValue.copyWith(updatedAt: DateTime.now()));
   }
 
   Future<DataValue?> getDataValue(String id) async {

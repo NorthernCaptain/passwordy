@@ -1500,45 +1500,6 @@ typedef $$SetupValuesTableUpdateCompanionBuilder = SetupValuesCompanion
   Value<String> value,
 });
 
-class $$SetupValuesTableTableManager extends RootTableManager<
-    _$VaultDatabase,
-    $SetupValuesTable,
-    SetupValue,
-    $$SetupValuesTableFilterComposer,
-    $$SetupValuesTableOrderingComposer,
-    $$SetupValuesTableCreateCompanionBuilder,
-    $$SetupValuesTableUpdateCompanionBuilder> {
-  $$SetupValuesTableTableManager(_$VaultDatabase db, $SetupValuesTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$SetupValuesTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$SetupValuesTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> key = const Value.absent(),
-            Value<String> value = const Value.absent(),
-          }) =>
-              SetupValuesCompanion(
-            id: id,
-            key: key,
-            value: value,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String key,
-            required String value,
-          }) =>
-              SetupValuesCompanion.insert(
-            id: id,
-            key: key,
-            value: value,
-          ),
-        ));
-}
-
 class $$SetupValuesTableFilterComposer
     extends FilterComposer<_$VaultDatabase, $SetupValuesTable> {
   $$SetupValuesTableFilterComposer(super.$state);
@@ -1577,6 +1538,69 @@ class $$SetupValuesTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$SetupValuesTableTableManager extends RootTableManager<
+    _$VaultDatabase,
+    $SetupValuesTable,
+    SetupValue,
+    $$SetupValuesTableFilterComposer,
+    $$SetupValuesTableOrderingComposer,
+    $$SetupValuesTableCreateCompanionBuilder,
+    $$SetupValuesTableUpdateCompanionBuilder,
+    (
+      SetupValue,
+      BaseReferences<_$VaultDatabase, $SetupValuesTable, SetupValue>
+    ),
+    SetupValue,
+    PrefetchHooks Function()> {
+  $$SetupValuesTableTableManager(_$VaultDatabase db, $SetupValuesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$SetupValuesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$SetupValuesTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> key = const Value.absent(),
+            Value<String> value = const Value.absent(),
+          }) =>
+              SetupValuesCompanion(
+            id: id,
+            key: key,
+            value: value,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String key,
+            required String value,
+          }) =>
+              SetupValuesCompanion.insert(
+            id: id,
+            key: key,
+            value: value,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SetupValuesTableProcessedTableManager = ProcessedTableManager<
+    _$VaultDatabase,
+    $SetupValuesTable,
+    SetupValue,
+    $$SetupValuesTableFilterComposer,
+    $$SetupValuesTableOrderingComposer,
+    $$SetupValuesTableCreateCompanionBuilder,
+    $$SetupValuesTableUpdateCompanionBuilder,
+    (
+      SetupValue,
+      BaseReferences<_$VaultDatabase, $SetupValuesTable, SetupValue>
+    ),
+    SetupValue,
+    PrefetchHooks Function()>;
 typedef $$TemplatesTableCreateCompanionBuilder = TemplatesCompanion Function({
   Value<String> id,
   Value<DateTime> updatedAt,
@@ -1604,75 +1628,41 @@ typedef $$TemplatesTableUpdateCompanionBuilder = TemplatesCompanion Function({
   Value<int> rowid,
 });
 
-class $$TemplatesTableTableManager extends RootTableManager<
-    _$VaultDatabase,
-    $TemplatesTable,
-    Template,
-    $$TemplatesTableFilterComposer,
-    $$TemplatesTableOrderingComposer,
-    $$TemplatesTableCreateCompanionBuilder,
-    $$TemplatesTableUpdateCompanionBuilder> {
-  $$TemplatesTableTableManager(_$VaultDatabase db, $TemplatesTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$TemplatesTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$TemplatesTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<bool> isDeleted = const Value.absent(),
-            Value<bool> isVisible = const Value.absent(),
-            Value<bool> isData = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String?> category = const Value.absent(),
-            Value<String> icon = const Value.absent(),
-            Value<String> color = const Value.absent(),
-            Value<int> sort = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              TemplatesCompanion(
-            id: id,
-            updatedAt: updatedAt,
-            isDeleted: isDeleted,
-            isVisible: isVisible,
-            isData: isData,
-            title: title,
-            category: category,
-            icon: icon,
-            color: color,
-            sort: sort,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<bool> isDeleted = const Value.absent(),
-            Value<bool> isVisible = const Value.absent(),
-            Value<bool> isData = const Value.absent(),
-            required String title,
-            Value<String?> category = const Value.absent(),
-            required String icon,
-            required String color,
-            required int sort,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              TemplatesCompanion.insert(
-            id: id,
-            updatedAt: updatedAt,
-            isDeleted: isDeleted,
-            isVisible: isVisible,
-            isData: isData,
-            title: title,
-            category: category,
-            icon: icon,
-            color: color,
-            sort: sort,
-            rowid: rowid,
-          ),
-        ));
+final class $$TemplatesTableReferences
+    extends BaseReferences<_$VaultDatabase, $TemplatesTable, Template> {
+  $$TemplatesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TemplateDetailsTable, List<TemplateDetail>>
+      _templateDetailsRefsTable(_$VaultDatabase db) =>
+          MultiTypedResultKey.fromTable(db.templateDetails,
+              aliasName: $_aliasNameGenerator(
+                  db.templates.id, db.templateDetails.templateId));
+
+  $$TemplateDetailsTableProcessedTableManager get templateDetailsRefs {
+    final manager =
+        $$TemplateDetailsTableTableManager($_db, $_db.templateDetails)
+            .filter((f) => f.templateId.id($_item.id));
+
+    final cache =
+        $_typedResult.readTableOrNull(_templateDetailsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$DataValuesTable, List<DataValue>>
+      _dataValuesRefsTable(_$VaultDatabase db) => MultiTypedResultKey.fromTable(
+          db.dataValues,
+          aliasName:
+              $_aliasNameGenerator(db.templates.id, db.dataValues.templateId));
+
+  $$DataValuesTableProcessedTableManager get dataValuesRefs {
+    final manager = $$DataValuesTableTableManager($_db, $_db.dataValues)
+        .filter((f) => f.templateId.id($_item.id));
+
+    final cache = $_typedResult.readTableOrNull(_dataValuesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
 }
 
 class $$TemplatesTableFilterComposer
@@ -1810,6 +1800,136 @@ class $$TemplatesTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$TemplatesTableTableManager extends RootTableManager<
+    _$VaultDatabase,
+    $TemplatesTable,
+    Template,
+    $$TemplatesTableFilterComposer,
+    $$TemplatesTableOrderingComposer,
+    $$TemplatesTableCreateCompanionBuilder,
+    $$TemplatesTableUpdateCompanionBuilder,
+    (Template, $$TemplatesTableReferences),
+    Template,
+    PrefetchHooks Function({bool templateDetailsRefs, bool dataValuesRefs})> {
+  $$TemplatesTableTableManager(_$VaultDatabase db, $TemplatesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$TemplatesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$TemplatesTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<bool> isVisible = const Value.absent(),
+            Value<bool> isData = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String?> category = const Value.absent(),
+            Value<String> icon = const Value.absent(),
+            Value<String> color = const Value.absent(),
+            Value<int> sort = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TemplatesCompanion(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            isVisible: isVisible,
+            isData: isData,
+            title: title,
+            category: category,
+            icon: icon,
+            color: color,
+            sort: sort,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<bool> isVisible = const Value.absent(),
+            Value<bool> isData = const Value.absent(),
+            required String title,
+            Value<String?> category = const Value.absent(),
+            required String icon,
+            required String color,
+            required int sort,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TemplatesCompanion.insert(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            isVisible: isVisible,
+            isData: isData,
+            title: title,
+            category: category,
+            icon: icon,
+            color: color,
+            sort: sort,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$TemplatesTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: (
+              {templateDetailsRefs = false, dataValuesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (templateDetailsRefs) db.templateDetails,
+                if (dataValuesRefs) db.dataValues
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (templateDetailsRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable: $$TemplatesTableReferences
+                            ._templateDetailsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$TemplatesTableReferences(db, table, p0)
+                                .templateDetailsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.templateId == item.id),
+                        typedResults: items),
+                  if (dataValuesRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $$TemplatesTableReferences._dataValuesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$TemplatesTableReferences(db, table, p0)
+                                .dataValuesRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.templateId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$TemplatesTableProcessedTableManager = ProcessedTableManager<
+    _$VaultDatabase,
+    $TemplatesTable,
+    Template,
+    $$TemplatesTableFilterComposer,
+    $$TemplatesTableOrderingComposer,
+    $$TemplatesTableCreateCompanionBuilder,
+    $$TemplatesTableUpdateCompanionBuilder,
+    (Template, $$TemplatesTableReferences),
+    Template,
+    PrefetchHooks Function({bool templateDetailsRefs, bool dataValuesRefs})>;
 typedef $$TemplateDetailsTableCreateCompanionBuilder = TemplateDetailsCompanion
     Function({
   Value<String> id,
@@ -1833,64 +1953,39 @@ typedef $$TemplateDetailsTableUpdateCompanionBuilder = TemplateDetailsCompanion
   Value<int> rowid,
 });
 
-class $$TemplateDetailsTableTableManager extends RootTableManager<
-    _$VaultDatabase,
-    $TemplateDetailsTable,
-    TemplateDetail,
-    $$TemplateDetailsTableFilterComposer,
-    $$TemplateDetailsTableOrderingComposer,
-    $$TemplateDetailsTableCreateCompanionBuilder,
-    $$TemplateDetailsTableUpdateCompanionBuilder> {
-  $$TemplateDetailsTableTableManager(
-      _$VaultDatabase db, $TemplateDetailsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$TemplateDetailsTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$TemplateDetailsTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<bool> isDeleted = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<FieldType> fieldType = const Value.absent(),
-            Value<int> sort = const Value.absent(),
-            Value<String> templateId = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              TemplateDetailsCompanion(
-            id: id,
-            updatedAt: updatedAt,
-            isDeleted: isDeleted,
-            title: title,
-            fieldType: fieldType,
-            sort: sort,
-            templateId: templateId,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<bool> isDeleted = const Value.absent(),
-            required String title,
-            required FieldType fieldType,
-            required int sort,
-            required String templateId,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              TemplateDetailsCompanion.insert(
-            id: id,
-            updatedAt: updatedAt,
-            isDeleted: isDeleted,
-            title: title,
-            fieldType: fieldType,
-            sort: sort,
-            templateId: templateId,
-            rowid: rowid,
-          ),
-        ));
+final class $$TemplateDetailsTableReferences extends BaseReferences<
+    _$VaultDatabase, $TemplateDetailsTable, TemplateDetail> {
+  $$TemplateDetailsTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $TemplatesTable _templateIdTable(_$VaultDatabase db) =>
+      db.templates.createAlias(
+          $_aliasNameGenerator(db.templateDetails.templateId, db.templates.id));
+
+  $$TemplatesTableProcessedTableManager? get templateId {
+    if ($_item.templateId == null) return null;
+    final manager = $$TemplatesTableTableManager($_db, $_db.templates)
+        .filter((f) => f.id($_item.templateId!));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static MultiTypedResultKey<$DataValuesTable, List<DataValue>>
+      _dataValuesRefsTable(_$VaultDatabase db) =>
+          MultiTypedResultKey.fromTable(db.dataValues,
+              aliasName: $_aliasNameGenerator(
+                  db.templateDetails.id, db.dataValues.templateDetailId));
+
+  $$DataValuesTableProcessedTableManager get dataValuesRefs {
+    final manager = $$DataValuesTableTableManager($_db, $_db.dataValues)
+        .filter((f) => f.templateDetailId.id($_item.id));
+
+    final cache = $_typedResult.readTableOrNull(_dataValuesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
 }
 
 class $$TemplateDetailsTableFilterComposer
@@ -2000,6 +2095,135 @@ class $$TemplateDetailsTableOrderingComposer
   }
 }
 
+class $$TemplateDetailsTableTableManager extends RootTableManager<
+    _$VaultDatabase,
+    $TemplateDetailsTable,
+    TemplateDetail,
+    $$TemplateDetailsTableFilterComposer,
+    $$TemplateDetailsTableOrderingComposer,
+    $$TemplateDetailsTableCreateCompanionBuilder,
+    $$TemplateDetailsTableUpdateCompanionBuilder,
+    (TemplateDetail, $$TemplateDetailsTableReferences),
+    TemplateDetail,
+    PrefetchHooks Function({bool templateId, bool dataValuesRefs})> {
+  $$TemplateDetailsTableTableManager(
+      _$VaultDatabase db, $TemplateDetailsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$TemplateDetailsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$TemplateDetailsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<FieldType> fieldType = const Value.absent(),
+            Value<int> sort = const Value.absent(),
+            Value<String> templateId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TemplateDetailsCompanion(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            title: title,
+            fieldType: fieldType,
+            sort: sort,
+            templateId: templateId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required String title,
+            required FieldType fieldType,
+            required int sort,
+            required String templateId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TemplateDetailsCompanion.insert(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            title: title,
+            fieldType: fieldType,
+            sort: sort,
+            templateId: templateId,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$TemplateDetailsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: (
+              {templateId = false, dataValuesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (dataValuesRefs) db.dataValues],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (templateId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.templateId,
+                    referencedTable:
+                        $$TemplateDetailsTableReferences._templateIdTable(db),
+                    referencedColumn: $$TemplateDetailsTableReferences
+                        ._templateIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (dataValuesRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable: $$TemplateDetailsTableReferences
+                            ._dataValuesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$TemplateDetailsTableReferences(db, table, p0)
+                                .dataValuesRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.templateDetailId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$TemplateDetailsTableProcessedTableManager = ProcessedTableManager<
+    _$VaultDatabase,
+    $TemplateDetailsTable,
+    TemplateDetail,
+    $$TemplateDetailsTableFilterComposer,
+    $$TemplateDetailsTableOrderingComposer,
+    $$TemplateDetailsTableCreateCompanionBuilder,
+    $$TemplateDetailsTableUpdateCompanionBuilder,
+    (TemplateDetail, $$TemplateDetailsTableReferences),
+    TemplateDetail,
+    PrefetchHooks Function({bool templateId, bool dataValuesRefs})>;
 typedef $$DataValuesTableCreateCompanionBuilder = DataValuesCompanion Function({
   Value<String> id,
   Value<DateTime> updatedAt,
@@ -2019,59 +2243,38 @@ typedef $$DataValuesTableUpdateCompanionBuilder = DataValuesCompanion Function({
   Value<int> rowid,
 });
 
-class $$DataValuesTableTableManager extends RootTableManager<
-    _$VaultDatabase,
-    $DataValuesTable,
-    DataValue,
-    $$DataValuesTableFilterComposer,
-    $$DataValuesTableOrderingComposer,
-    $$DataValuesTableCreateCompanionBuilder,
-    $$DataValuesTableUpdateCompanionBuilder> {
-  $$DataValuesTableTableManager(_$VaultDatabase db, $DataValuesTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$DataValuesTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$DataValuesTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<bool> isDeleted = const Value.absent(),
-            Value<String> value = const Value.absent(),
-            Value<String> templateId = const Value.absent(),
-            Value<String> templateDetailId = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              DataValuesCompanion(
-            id: id,
-            updatedAt: updatedAt,
-            isDeleted: isDeleted,
-            value: value,
-            templateId: templateId,
-            templateDetailId: templateDetailId,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<bool> isDeleted = const Value.absent(),
-            required String value,
-            required String templateId,
-            required String templateDetailId,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              DataValuesCompanion.insert(
-            id: id,
-            updatedAt: updatedAt,
-            isDeleted: isDeleted,
-            value: value,
-            templateId: templateId,
-            templateDetailId: templateDetailId,
-            rowid: rowid,
-          ),
-        ));
+final class $$DataValuesTableReferences
+    extends BaseReferences<_$VaultDatabase, $DataValuesTable, DataValue> {
+  $$DataValuesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $TemplatesTable _templateIdTable(_$VaultDatabase db) =>
+      db.templates.createAlias(
+          $_aliasNameGenerator(db.dataValues.templateId, db.templates.id));
+
+  $$TemplatesTableProcessedTableManager? get templateId {
+    if ($_item.templateId == null) return null;
+    final manager = $$TemplatesTableTableManager($_db, $_db.templates)
+        .filter((f) => f.id($_item.templateId!));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $TemplateDetailsTable _templateDetailIdTable(_$VaultDatabase db) =>
+      db.templateDetails.createAlias($_aliasNameGenerator(
+          db.dataValues.templateDetailId, db.templateDetails.id));
+
+  $$TemplateDetailsTableProcessedTableManager? get templateDetailId {
+    if ($_item.templateDetailId == null) return null;
+    final manager =
+        $$TemplateDetailsTableTableManager($_db, $_db.templateDetails)
+            .filter((f) => f.id($_item.templateDetailId!));
+    final item = $_typedResult.readTableOrNull(_templateDetailIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
 }
 
 class $$DataValuesTableFilterComposer
@@ -2171,6 +2374,128 @@ class $$DataValuesTableOrderingComposer
     return composer;
   }
 }
+
+class $$DataValuesTableTableManager extends RootTableManager<
+    _$VaultDatabase,
+    $DataValuesTable,
+    DataValue,
+    $$DataValuesTableFilterComposer,
+    $$DataValuesTableOrderingComposer,
+    $$DataValuesTableCreateCompanionBuilder,
+    $$DataValuesTableUpdateCompanionBuilder,
+    (DataValue, $$DataValuesTableReferences),
+    DataValue,
+    PrefetchHooks Function({bool templateId, bool templateDetailId})> {
+  $$DataValuesTableTableManager(_$VaultDatabase db, $DataValuesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$DataValuesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$DataValuesTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<String> value = const Value.absent(),
+            Value<String> templateId = const Value.absent(),
+            Value<String> templateDetailId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DataValuesCompanion(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            value: value,
+            templateId: templateId,
+            templateDetailId: templateDetailId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required String value,
+            required String templateId,
+            required String templateDetailId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DataValuesCompanion.insert(
+            id: id,
+            updatedAt: updatedAt,
+            isDeleted: isDeleted,
+            value: value,
+            templateId: templateId,
+            templateDetailId: templateDetailId,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$DataValuesTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: (
+              {templateId = false, templateDetailId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (templateId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.templateId,
+                    referencedTable:
+                        $$DataValuesTableReferences._templateIdTable(db),
+                    referencedColumn:
+                        $$DataValuesTableReferences._templateIdTable(db).id,
+                  ) as T;
+                }
+                if (templateDetailId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.templateDetailId,
+                    referencedTable:
+                        $$DataValuesTableReferences._templateDetailIdTable(db),
+                    referencedColumn: $$DataValuesTableReferences
+                        ._templateDetailIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$DataValuesTableProcessedTableManager = ProcessedTableManager<
+    _$VaultDatabase,
+    $DataValuesTable,
+    DataValue,
+    $$DataValuesTableFilterComposer,
+    $$DataValuesTableOrderingComposer,
+    $$DataValuesTableCreateCompanionBuilder,
+    $$DataValuesTableUpdateCompanionBuilder,
+    (DataValue, $$DataValuesTableReferences),
+    DataValue,
+    PrefetchHooks Function({bool templateId, bool templateDetailId})>;
 
 class $VaultDatabaseManager {
   final _$VaultDatabase _db;

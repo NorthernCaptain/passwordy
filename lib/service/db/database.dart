@@ -20,10 +20,14 @@ Future<bool> databaseExists(String dbName) async {
   return File(p.join(path.path, dbName)).exists();
 }
 
+Future<String> databasePath(String dbName) async {
+  final path = await getApplicationDocumentsDirectory();
+  return p.join(path.path, dbName);
+}
+
 QueryExecutor _openDatabase(String name, String password) {
   return LazyDatabase(() async {
-    final path = await getApplicationDocumentsDirectory();
-    final dbfile = File(p.join(path.path, name));
+    final dbfile = File(await databasePath(name));
     lg?.i("Opening database at ${dbfile.path}");
     return NativeDatabase.createInBackground(
       dbfile,
