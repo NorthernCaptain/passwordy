@@ -19,13 +19,16 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('New Vault'),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(

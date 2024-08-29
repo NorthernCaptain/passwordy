@@ -52,7 +52,9 @@ class _VaultListScreenState
                 final data = snapshot.data!;
 
                 if (data.isEmpty) {
-                  return const EmptyState();
+                  return widget.vault.isConnected
+                      ? const EmptyState()
+                      : const Center(child: CircularProgressIndicator());
                 }
 
                 return ListView.builder(

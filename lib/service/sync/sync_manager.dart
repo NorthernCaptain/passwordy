@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:passwordy/service/db/database.dart';
 import 'package:passwordy/service/log.dart';
 import 'package:passwordy/service/sync/drive_service.dart';
 import 'package:passwordy/service/db/db_vault.dart';
@@ -22,11 +23,11 @@ class SyncManager {
   final DriveService _driveService = DriveService(DriveServiceType.googleDrive);
   bool _isSignedIn = false;
 
-  Future<bool> ensureSignedIn() async {
-    if (_isSignedIn) return true;
+  Future<bool> ensureSignedIn({bool useSilent = true}) async {
+    if (_isSignedIn && useSilent) return true;
 
     // Try silent sign-in first
-    bool success = await _driveService.silentSignIn();
+    bool success = useSilent ? await _driveService.silentSignIn() : false;
 
     if (!success) {
       // If silent sign-in fails, try regular sign-in
@@ -87,6 +88,26 @@ class SyncManager {
         return true;
       } catch (e) {
         lg?.e('Error uploading backup: $e');
+        return false;
+      }
+    });
+  }
+
+  Future<bool> downloadVault({String name = Vault.masterDB}) async {
+    const folderName = '$remoteFolder/$mainBackupFolder';
+    return await guarded((drive) async {
+      try {
+        final fileId = await drive.fileExists(name, folderName);
+        if (fileId == null) {
+          lg?.e('Remote file not found: $folderName/$name');
+          return false;
+        }
+        final path = await databasePath(name);
+        final dbpath = await drive.getFile(fileId, path);
+        lg?.i('Downloaded main vault from $folderName/$name to $dbpath');
+        return true;
+      } catch (e) {
+        lg?.e('Error downloading main vault: $e');
         return false;
       }
     });

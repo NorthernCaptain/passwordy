@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passwordy/screens/login_screen.dart';
+import 'package:passwordy/screens/new_or_import_screen.dart';
 import 'package:passwordy/service/preferences.dart';
 import 'master_password.dart';
 import '../service/auth_service.dart';
@@ -39,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
       case AuthStatus.newVault:
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const MasterPasswordScreen(),
+            builder: (context) => const NewOrImportScreen(),
           ),
         );
         break;

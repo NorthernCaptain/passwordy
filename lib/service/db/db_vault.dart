@@ -20,6 +20,13 @@ abstract class Vault {
     return exists;
   }
 
+  static Future<void> resetDB({String name = Vault.masterDB}) async {
+    final dbfile = File(await databasePath(name));
+    if(await dbfile.exists()) {
+      await dbfile.delete();
+    }
+  }
+
   void scheduleSync();
 
   Future<bool> openDB({String name = Vault.masterDB});
@@ -71,7 +78,6 @@ class DBVault extends Vault {
 
   @override
   Stream<bool> get connectionStream => _connectionController.stream;
-
 
   @override
   Future<bool> openDB({String name = Vault.masterDB}) async {
